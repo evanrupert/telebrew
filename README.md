@@ -1,4 +1,4 @@
-# TelegramApi
+# Telegram Bot Wrapper
 
 **TODO: Add description**
 

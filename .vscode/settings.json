@@ -1,4 +1,10 @@
 {
     "editor.tabSize": 2,
-    "editor.insertSpaces": true
+    "editor.insertSpaces": true,
+
+    "search.exclude": {
+        "**/_build": true,
+        "**/deps": true,
+        "**/doc": true
+    }
 }

@@ -3,10 +3,9 @@ defmodule TelegramApi do
   Documentation for TelegramApi.
   """
 
-  alias TelegramApi.{HTTP}
 
   def main(_argv) do
-    
+    IO.puts "Hello, World!"
   end
 
 end

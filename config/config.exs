@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure your application as:
 #
-#     config :telegram_api, key: :value
+#     config :telegram_bot_wrapper, key: :value
 #
 # and access this configuration in your application as:
 #
-#     Application.get_env(:telegram_api, :key)
+#     Application.get_env(:telegram_bot_wrapper, :key)
 #
 # You can also configure a 3rd-party app:
 #
@@ -30,5 +30,5 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 
-config :telegram_api,
+config :telegram_bot_wrapper,
   api_key: "469344097:AAGAEDkgFnL2hSvCy9c6muxsJSdUVyC4E-I"
