@@ -31,11 +31,6 @@ defmodule TelegramBotWrapper.Mixfile do
   end
 end
 
-
-# TODO: implement all the types as structs and parse the string maps to structs !IMPORTANT
-# https://stackoverflow.com/questions/31990134/how-to-convert-map-keys-from-strings-to-atoms-in-elixir
-# make this recursive
-# use struct/2 to translate these into structs
-
+# TODO: implement all methods in the telegram bot api
 
 # TODO: implement polling for the getUpdates method

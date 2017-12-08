@@ -1,4 +1,4 @@
-defmodule TelegramApiTest do
+defmodule TelegramBotWrapperTest do
   use ExUnit.Case
   doctest TelegramApi
 
