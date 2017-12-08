@@ -10,7 +10,8 @@ defmodule TelegramBotWrapper.Methods do
   @doc """
   Sends a message to the given chat_id
 
-  Returns {:ok, result} where result is the http response or {:error, reason} where reason is the error
+  Returns { :ok, result } where result is a [Message](#{@docs_address}#message) or { :error, reason }
+  
 
   ## Optional Parameters ##
    
@@ -42,6 +43,14 @@ defmodule TelegramBotWrapper.Methods do
   end
 
   @doc """
+  Same as `send_message/2` but will throw `TelegramBotWrapper.Error` exception on failure
+  """
+  def send_message!(chat_id, message, params \\ []) do
+    send_message(chat_id, message, params)
+    |> check_error
+  end
+
+  @doc """
   Returns basic information about the bot in the form of a User object
   """
   def get_me(), do: request("getMe", %{})
@@ -65,7 +74,21 @@ defmodule TelegramBotWrapper.Methods do
     |> add_optional_params([:disable_notification], params)
 
     request("forwardMessage", json_body)
+  end
 
+
+  @doc """
+  Same as `forward_message/3` but will throw `TelegramBotWrapper.Error` on failure
+  """
+  def forward_message!(chat_id, from_chat, message_id, params \\ []) do
+    forward_message(chat_id, from_chat, message_id, params)
+    |> check_error
+  end
+
+
+  defp check_error({ :ok, resp }), do: resp
+  defp check_error({ :error, %{error_code: c, description: d } }) do
+    raise TelegramBotWrapper.Error, message: d, error_code: c
   end
 
 
