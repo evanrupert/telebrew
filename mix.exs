@@ -34,3 +34,9 @@ end
 # TODO: implement all methods in the telegram bot api
 
 # TODO: implement polling for the getUpdates method
+
+# TODO: implement validation for matches
+
+# TODO: return message text without command in it
+
+# TODO: test repeat match declarations and stuff like that and then implement validation for that

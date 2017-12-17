@@ -3,3 +3,5 @@ import_if_available TelegramBotWrapper.HTTP
 import_if_available TelegramBotWrapper.Methods
 
 import_if_available TelegramBotWrapperTest.Listener
+
+import_if_available TelegramBotWrapper.Polling

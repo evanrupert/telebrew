@@ -1,17 +1,19 @@
 defmodule Testing do
   use TelegramBotWrapper.Listener
 
-  on "/help" do
-    IO.puts "Print help options"
+
+  on "/test" do
+    send_message(m.chat.id, "Test command called with message: #{m.text}")
   end
 
-  on "/something" do
-    IO.puts "Something"
+
+  on "/something", as: :message do
+    send_message(message.chat.id, "Something command called with message: #{message.text}")
   end
+
 
   on "text" do
-    IO.puts "Some text thing"
+    send_message(m.chat.id, "Text was called with message: #{m.text}")
   end
 
-  
 end
