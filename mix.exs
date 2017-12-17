@@ -40,3 +40,7 @@ end
 # TODO: return message text without command in it
 
 # TODO: test repeat match declarations and stuff like that and then implement validation for that
+
+# TODO: write documentation for all functions
+
+# TODO: write tests for all modules
