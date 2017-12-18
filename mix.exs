@@ -29,8 +29,6 @@ defmodule Telebrew.Mixfile do
   end
 end
 
-# TODO: start each listener evaluation in its own process as to not interfere with other listeners
-
 # TODO: write github readme with install, config, and getting started instructions
 
 # TODO: implement all methods in the telegram bot api
