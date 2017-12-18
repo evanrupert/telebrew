@@ -1,4 +1,4 @@
-defmodule TelegramBotWrapper.ListenerError do
+defmodule Telebrew.ListenerError do
   @moduledoc """
   Module that contains the main error for all event listener syntex errors
   """
@@ -7,12 +7,12 @@ defmodule TelegramBotWrapper.ListenerError do
   Main error for all event listener syntex errors
 
   ## Example ##
-      use TelegramBotWrapper.Listener
+      use Telebrew.Listener
       on "/test", do: :something
       on "/test", do: :something_else
       # will result in
       == Compilation error in file lib/testing.ex ==
-      ** (TelegramBotWrapper.ListenerError) "Event Listener: '/test' is alread defined"
+      ** (Telebrew.ListenerError) "Event Listener: '/test' is alread defined"
       lib/testing.ex:14: (module)
       (stdlib) erl_eval.erl:670: :erl_eval.do_apply/6
   """

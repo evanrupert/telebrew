@@ -1,5 +1,5 @@
-defmodule TelegramBotWrapper.Methods do
-  import TelegramBotWrapper.HTTP
+defmodule Telebrew.Methods do
+  import Telebrew.HTTP
 
   @docs_address "https://core.telegram.org/bots/api"
 
@@ -43,7 +43,7 @@ defmodule TelegramBotWrapper.Methods do
   end
 
   @doc """
-  Same as `send_message/2` but will throw `TelegramBotWrapper.Error` exception on failure
+  Same as `send_message/2` but will throw `Telebrew.Error` exception on failure
   """
   def send_message!(chat_id, message, params \\ []) do
     send_message(chat_id, message, params)
@@ -78,7 +78,7 @@ defmodule TelegramBotWrapper.Methods do
 
 
   @doc """
-  Same as `forward_message/3` but will throw `TelegramBotWrapper.Error` on failure
+  Same as `forward_message/3` but will throw `Telebrew.Error` on failure
   """
   def forward_message!(chat_id, from_chat, message_id, params \\ []) do
     forward_message(chat_id, from_chat, message_id, params)
@@ -88,7 +88,7 @@ defmodule TelegramBotWrapper.Methods do
 
   defp check_error({ :ok, resp }), do: resp
   defp check_error({ :error, %{error_code: c, description: d } }) do
-    raise TelegramBotWrapper.Error, message: d, error_code: c
+    raise Telebrew.Error, message: d, error_code: c
   end
 
 

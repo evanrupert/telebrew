@@ -1,6 +1,6 @@
-defmodule TelegramApi do
+defmodule Telebrew do
   @moduledoc """
-  Documentation for TelegramApi.
+  Documentation for Telebrew.
   """
 
 

@@ -1,7 +1,7 @@
-import_if_available TelegramBotWrapper.HTTP
+import_if_available Telebrew.HTTP
 
-import_if_available TelegramBotWrapper.Methods
+import_if_available Telebrew.Methods
 
-import_if_available TelegramBotWrapperTest.Listener
+import_if_available TelebrewTest.Listener
 
-import_if_available TelegramBotWrapper.Polling
+import_if_available Telebrew.Polling

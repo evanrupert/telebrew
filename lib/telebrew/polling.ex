@@ -1,4 +1,4 @@
-defmodule TelegramBotWrapper.Polling do
+defmodule Telebrew.Polling do
   @moduledoc false
   
   @interval unless Application.get_env(:telegram_bot_wrapper, :polling_interval), 
@@ -14,7 +14,7 @@ defmodule TelegramBotWrapper.Polling do
 
 
   defp get_last_update_id do
-    last_update = List.last(TelegramBotWrapper.HTTP.request!("getUpdates", %{}))
+    last_update = List.last(Telebrew.HTTP.request!("getUpdates", %{}))
     if last_update do
       last_update.update_id
     else
@@ -24,7 +24,7 @@ defmodule TelegramBotWrapper.Polling do
 
   
   def polling(current_pid, last_update_id) do
-    last_update = List.last(TelegramBotWrapper.HTTP.request!("getUpdates", %{}))
+    last_update = List.last(Telebrew.HTTP.request!("getUpdates", %{}))
     
     new_update = if last_update.update_id == last_update_id do nil else last_update end
 

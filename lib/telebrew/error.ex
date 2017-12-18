@@ -1,10 +1,10 @@
-defmodule TelegramBotWrapper.Error do
+defmodule Telebrew.Error do
   @moduledoc """
-  This module stores the default error used by TelegramBotWrapper
+  This module stores the default error used by Telebrew
   """
 
   @doc """
-  Default error used by TelegramBotWrapper
+  Default error used by Telebrew
   Contains message field with a description of what caused the error and
   the error code field which contains an error code if the error is an http
   based error

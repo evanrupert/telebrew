@@ -1,4 +1,4 @@
-defmodule TelegramBotWrapper.Listener do
+defmodule Telebrew.Listener do
   @moduledoc """
   Contains all macros for defining message event listeners
   """
@@ -8,7 +8,7 @@ defmodule TelegramBotWrapper.Listener do
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__)
-      import TelegramBotWrapper.Methods
+      import Telebrew.Methods
 
       Module.register_attribute __MODULE__, :events, accumulate: true
       @before_compile unquote(__MODULE__)
@@ -19,7 +19,7 @@ defmodule TelegramBotWrapper.Listener do
   defmacro __before_compile__(_env) do
     quote do
       def start do
-        TelegramBotWrapper.Polling.start(self(), __MODULE__, @events)
+        Telebrew.Polling.start(self(), __MODULE__, @events)
       end
     end
   end
@@ -65,20 +65,20 @@ defmodule TelegramBotWrapper.Listener do
       match_string = to_string(unquote(match_atom))
       # raise error if listener match is empty
       if match_string == "" do
-        raise TelegramBotWrapper.ListenerError, message: "Event Listener: \'#{match_string}\' cannot be empty"
+        raise Telebrew.ListenerError, message: "Event Listener: \'#{match_string}\' cannot be empty"
       end
       # raise error if listener has already been defined
       if unquote(match_atom) in @events do
-        raise TelegramBotWrapper.ListenerError, message: "Event Listener: \'#{match_string}\' is alread defined"
+        raise Telebrew.ListenerError, message: "Event Listener: \'#{match_string}\' is alread defined"
       end
       # raise error if match is not a valid event and does not start with /
       if (not String.starts_with?(match_string, "/")) and (not unquote(match_atom) in unquote(@reserved_events)) do
         msg = "Event Listener: \'#{match_string}\' is not a valid command or event. Perhaps you ment \'/#{match_string}\'"
-        raise TelegramBotWrapper.ListenerError, message: msg
+        raise Telebrew.ListenerError, message: msg
       end
       # raise error if match has a space in it
       if String.contains?(match_string, [" "]) do
-        raise TelegramBotWrapper.ListenerError, message: "Event Listener: \'#{match_string}\' should be a single event or command (no spaces allowed)"
+        raise Telebrew.ListenerError, message: "Event Listener: \'#{match_string}\' should be a single event or command (no spaces allowed)"
       end
 
       @events unquote(match_atom)

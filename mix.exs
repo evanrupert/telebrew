@@ -1,9 +1,9 @@
-defmodule TelegramBotWrapper.Mixfile do
+defmodule Telebrew.Mixfile do
   use Mix.Project
 
   def project do
     [
-      app: :telegram_bot_wrapper,
+      app: :telebrew,
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
@@ -21,8 +21,6 @@ defmodule TelegramBotWrapper.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       {:httpoison, "~> 0.13.0"},
       {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.18.1"},
@@ -31,7 +29,7 @@ defmodule TelegramBotWrapper.Mixfile do
   end
 end
 
-# TODO: move listen to TelegramBotWrapper.Listener instead of TelegramBotWrapper.Polling because it makes more sense
+# TODO: move listen to Telebrew.Listener instead of Telebrew.Polling because it makes more sense
 
 # TODO: write github readme with install, config, and getting started instructions
 

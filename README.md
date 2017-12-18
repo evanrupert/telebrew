@@ -1,4 +1,4 @@
-# Telegram Bot Wrapper
+# Telebrew
 
 **TODO: Add description**
 
@@ -10,7 +10,7 @@ by adding `telegram_api` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:telegram_api, "~> 0.1.0"}
+    {:telebrew, "~> 0.1.0"}
   ]
 end
 ```

@@ -1,4 +1,4 @@
-defmodule TelegramBotWrapper.HTTP do
+defmodule Telebrew.HTTP do
   
   
   @moduledoc """
@@ -6,7 +6,7 @@ defmodule TelegramBotWrapper.HTTP do
   """
 
   @url_base "https://api.telegram.org/bot"
-  @api_key Application.get_env(:telegram_bot_wrapper, :api_key)
+  @api_key Application.get_env(:telebrew, :api_key)
 
 
   @doc """
@@ -37,13 +37,13 @@ defmodule TelegramBotWrapper.HTTP do
 
 
   @doc """
-  Same as `request/2` but will throw `TelegramBotWrapper.Error` on failure
+  Same as `request/2` but will throw `Telebrew.Error` on failure
   """
   def request!(method, body) do
     case request(method, body) do
       { :ok, result } -> result
       { :error, %{ error_code: code, description: des } }
-        -> raise TelegramBotWrapper.Error, message: des, error_code: code
+        -> raise Telebrew.Error, message: des, error_code: code
     end
   end
 
