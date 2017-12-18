@@ -2,7 +2,7 @@ defmodule Telebrew.Listener do
   @moduledoc """
   Contains all macros for defining message event listeners
   """
-  @reserved_events [:text, :default]
+  @reserved_events [:text, :default, :photo, :sticker, :audio]
   @default_message_name :m
 
   defmacro __using__(_opts) do
@@ -97,13 +97,13 @@ defmodule Telebrew.Listener do
   def listen(module, events) do
     receive do
       { :update, message } ->
-        IO.puts "Received message: #{message.text}"
-        # if the match is a command starting with / handle as command
-        if String.starts_with?(message.text, "/") do
-          handle_command(module, events, message)
-        # if not handle as predefined event
-        else
-          handle_event(module, message)
+        IO.puts "Recieved Message: #{if Map.has_key?(message, :text) do message.text else "No Text" end}"
+
+        cond do
+          Map.has_key?(message, :text) and String.starts_with?(message.text, "/")
+            -> handle_command(module, events, message)
+          true
+            -> handle_event(module, message)
         end
     end
     listen(module, events)
@@ -134,10 +134,19 @@ defmodule Telebrew.Listener do
 
   defp handle_event(module, message) do
     cond do
-      # if text function exists call it
-      Keyword.has_key?(module.__info__(:functions), :text)
+      # message has photo and module has photo listener call photo listener
+      Map.has_key?(message, :photo) and Keyword.has_key?(module.__info__(:functions), :photo)
+        -> apply(module, :photo, [message])
+      # if message is sticker and module has sticker listener call sticker listener
+      Map.has_key?(message, :sticker) and Keyword.has_key?(module.__info__(:functions), :sticker)
+        -> apply(module, :sticker, [message])
+      # if message is audio and module has audio listener call audio listener
+      Map.has_key?(message, :audio) and Keyword.has_key?(module.__info__(:functions), :audio)
+        -> apply(module, :audio, [message])
+      # if message has text and text listener exists call text listener
+      Map.has_key?(message, :text) and Keyword.has_key?(module.__info__(:functions), :text)
         -> apply(module, :text, [message])
-      # if text function does not exist do nothing
+      # if none of the previous conditions then do nothing
       true
         -> nil
     end

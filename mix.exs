@@ -29,12 +29,20 @@ defmodule Telebrew.Mixfile do
   end
 end
 
+# TODO: start each listener evaluation in its own process as to not interfere with other listeners
+
 # TODO: write github readme with install, config, and getting started instructions
 
 # TODO: implement all methods in the telegram bot api
+
+# TODO: create when guards for further pattern matching
+# EXAMPLE
+# on "text", when: String.length(m.text) == 40 do
+#   send_message m.chat.id, "The character length is 40"
+# end
 
 # TODO: test repeat match declarations and stuff like that and then implement validation for that
 
 # TODO: write documentation for all functions
 
-# TODO: write tests for all modules
+# TODO: maybe add helper functions that will get the last n messages or something

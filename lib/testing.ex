@@ -1,23 +1,17 @@
 defmodule Testing do
   use Telebrew.Listener
 
-  on "/something" do
-    send_message m.chat.id, "Something listener with Text: \'#{m.text}\'"
+  on "photo" do
+    photos = m.photo
+    for %{"file_id" => file_id} <- photos do
+      send_photo m.chat.id, file_id
+    end
   end
 
 
   on "/test" do
-    send_message m.chat.id, "Test listener with Text: \'#{m.text}\'"
+    send_message m.chat.id, "System is working"
   end
 
-
-  on "text" do
-    send_message m.chat.id, "Text listener with Text: \'#{m.text}\'"
-  end
-
-
-  on "default" do
-    send_message m.chat.id, "Default listener with Text: \'#{m.text}\'"
-  end
 
 end

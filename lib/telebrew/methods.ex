@@ -55,6 +55,11 @@ defmodule Telebrew.Methods do
   """
   def get_me(), do: request("getMe", %{})
 
+  @doc """
+  Same as `get_me/0` but will throw `Telebrew.Error` exception on failure
+  """
+  def get_me!(), do: request("getMe", %{}) |> check_error
+
 
   @doc """
   Forward messages of any kind
@@ -65,7 +70,7 @@ defmodule Telebrew.Methods do
   | disable_notification | Boolean | Disables notification sound or vibration |
   """
   def forward_message(chat_id, from_chat_id, message_id, params \\ []) do
-
+    # TODO: test this somehow
     json_body = %{
       chat_id: chat_id,
       from_chat_id: from_chat_id,
@@ -82,6 +87,24 @@ defmodule Telebrew.Methods do
   """
   def forward_message!(chat_id, from_chat, message_id, params \\ []) do
     forward_message(chat_id, from_chat, message_id, params)
+    |> check_error
+  end
+
+
+  def send_photo(chat_id, photo, params \\ []) do
+    json_body = %{
+      chat_id: chat_id,
+      photo: photo
+    }
+    |> add_optional_params([:caption, :disable_notification,
+                            :reply_to_message_id, :reply_markup], 
+                            params)
+    request("sendPhoto", json_body)
+  end
+
+  
+  def send_photo!(chat_id, photo, params \\ []) do
+    send_photo(chat_id, photo, params)
     |> check_error
   end
 
