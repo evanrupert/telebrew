@@ -1,17 +1,19 @@
 defmodule Testing do
   use Telebrew.Listener
 
-  on "photo" do
-    photos = m.photo
-    for %{"file_id" => file_id} <- photos do
-      send_photo m.chat.id, file_id
-    end
-  end
-
-
   on "/test" do
     send_message m.chat.id, "System is working"
   end
 
+
+  on "/timer" do
+    :timer.sleep(10000)
+    send_message m.chat.id, "It has been ten seconds"
+  end
+
+
+  on "/exception" do
+    raise "This is an exception"
+  end
 
 end

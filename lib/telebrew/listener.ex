@@ -121,10 +121,10 @@ defmodule Telebrew.Listener do
     cond do
       # if match exists call that function 
       match
-        -> apply(module, match, [new_message])
+        -> spawn(module, match, [new_message])
       # if no match exists call default function
       Keyword.has_key?(module.__info__(:functions), :default)
-        -> apply(module, :default, [new_message])
+        -> spawn(module, :default, [new_message])
       # if no match and no default do nothing
       true
         -> nil
@@ -136,16 +136,16 @@ defmodule Telebrew.Listener do
     cond do
       # message has photo and module has photo listener call photo listener
       Map.has_key?(message, :photo) and Keyword.has_key?(module.__info__(:functions), :photo)
-        -> apply(module, :photo, [message])
+        -> spawn(module, :photo, [message])
       # if message is sticker and module has sticker listener call sticker listener
       Map.has_key?(message, :sticker) and Keyword.has_key?(module.__info__(:functions), :sticker)
-        -> apply(module, :sticker, [message])
+        -> spawn(module, :sticker, [message])
       # if message is audio and module has audio listener call audio listener
       Map.has_key?(message, :audio) and Keyword.has_key?(module.__info__(:functions), :audio)
-        -> apply(module, :audio, [message])
+        -> spawn(module, :audio, [message])
       # if message has text and text listener exists call text listener
       Map.has_key?(message, :text) and Keyword.has_key?(module.__info__(:functions), :text)
-        -> apply(module, :text, [message])
+        -> spawn(module, :text, [message])
       # if none of the previous conditions then do nothing
       true
         -> nil
