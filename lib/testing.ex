@@ -1,19 +1,38 @@
 defmodule Testing do
   use TelegramBotWrapper.Listener
 
-
-  on "/test" do
-    send_message(m.chat.id, "Test command called with message: #{m.text}")
+  on "/something" do
+    send_message m.chat.id, "Something listener with Text: \'#{m.text}\'"
   end
 
 
-  on "/something", as: :message do
-    send_message(message.chat.id, "Something command called with message: #{message.text}")
+  on "/test" do
+    send_message(m.chat.id, "Test listener with Text: \'#{m.text}\'")
+  end
+
+
+  on "/test2" do
+    send_message m.chat.id, "Test2 listener with Text: \'#{m.text}\'"
+  end
+
+
+  on "/test3" do
+    send_message m.chat.id, "Test3 listener with Text: \'#{m.text}\'"
+  end
+
+
+  on "/stuff" do
+    send_message m.chat.id, "Stuff listener with Text: \'#{m.text}\'"
   end
 
 
   on "text" do
-    send_message(m.chat.id, "Text was called with message: #{m.text}")
+    send_message(m.chat.id, "Text listener with Text: \'#{m.text}\'")
+  end
+
+
+  on "default" do
+    send_message m.chat.id, "Default listener with Text: \'#{m.text}\'"
   end
 
 end
