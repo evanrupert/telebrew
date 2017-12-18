@@ -90,5 +90,63 @@ defmodule Telebrew.Listener do
     end
   end
 
-  
+
+  @doc """
+  Recieves messages from polling and then calles the appropriate listener
+  """
+  def listen(module, events) do
+    receive do
+      { :update, message } ->
+        IO.puts "Received message: #{message.text}"
+        # if the match is a command starting with / handle as command
+        if String.starts_with?(message.text, "/") do
+          handle_command(module, events, message)
+        # if not handle as predefined event
+        else
+          handle_event(module, message)
+        end
+    end
+    listen(module, events)
+  end
+
+
+  defp handle_command(module, events, message) do
+    { cmd, msg } = split_message(message.text)
+    # update text to remove command
+    new_message = %{ message | text: msg }
+    cmd_atom = String.to_atom(cmd)
+    # find the event to call based on the command
+    match = Enum.find(events, fn x -> x == cmd_atom end)
+    
+    cond do
+      # if match exists call that function 
+      match
+        -> apply(module, match, [new_message])
+      # if no match exists call default function
+      Keyword.has_key?(module.__info__(:functions), :default)
+        -> apply(module, :default, [new_message])
+      # if no match and no default do nothing
+      true
+        -> nil
+    end
+  end
+
+
+  defp handle_event(module, message) do
+    cond do
+      # if text function exists call it
+      Keyword.has_key?(module.__info__(:functions), :text)
+        -> apply(module, :text, [message])
+      # if text function does not exist do nothing
+      true
+        -> nil
+    end
+  end
+
+
+  defp split_message(message) do
+    [fst|rest] = String.split(message, " ")
+    { fst, Enum.join(rest, " ")}
+  end
+
 end

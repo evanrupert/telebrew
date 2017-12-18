@@ -29,8 +29,6 @@ defmodule Telebrew.Mixfile do
   end
 end
 
-# TODO: move listen to Telebrew.Listener instead of Telebrew.Polling because it makes more sense
-
 # TODO: write github readme with install, config, and getting started instructions
 
 # TODO: implement all methods in the telegram bot api
