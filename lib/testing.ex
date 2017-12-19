@@ -6,14 +6,8 @@ defmodule Testing do
   end
 
 
-  on "/timer" do
-    :timer.sleep(10000)
-    send_message m.chat.id, "It has been ten seconds"
-  end
-
-
-  on "/exception" do
-    raise "This is an exception"
+  on "text", when: String.length(m.text) == 5 do
+    send_message m.chat.id, "That message is five characters long"
   end
 
 end

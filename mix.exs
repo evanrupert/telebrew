@@ -33,11 +33,7 @@ end
 
 # TODO: implement all methods in the telegram bot api
 
-# TODO: create when guards for further pattern matching
-# EXAMPLE
-# on "text", when: String.length(m.text) == 40 do
-#   send_message m.chat.id, "The character length is 40"
-# end
+# TODO: somehow make a way for multiple listener definitions with different guards
 
 # TODO: test repeat match declarations and stuff like that and then implement validation for that
 

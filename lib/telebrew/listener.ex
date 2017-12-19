@@ -24,15 +24,6 @@ defmodule Telebrew.Listener do
     end
   end
 
-  @doc """
-  Same as `on/2` but allows the user to define the name of the variable message
-  
-  ## Example ##
-      on "/hello", as: :thing do
-        send_message(thing.chat.id, "Hello")
-      end
-  """
-  defmacro on(match, _as = [as: name], _do = [do: block]), do: add_function(String.to_atom(match), {name, [], Elixir}, block)
 
   @doc """
   Main macro used for defining event listeners.
@@ -45,6 +36,9 @@ defmodule Telebrew.Listener do
   | ----    | ------                                                |
   | text    | Will match on any text without a command              |
   | default | Will match any command that is not previously defined |
+  | photo   | Will match any photo                                  |
+  | sticker | Will match any sticker                                |
+  | audio   | Will match any audio file                             |
 
   ## Examples ##
       # will be called on any message prefixed by '/test'
@@ -57,35 +51,42 @@ defmodule Telebrew.Listener do
         send_message m.chat.id, "You said: \#{m.text}"
       end
   """
-  defmacro on(match, _do = [do: block]), do: add_function(String.to_atom(match), {@default_message_name, [], Elixir}, block)
+  defmacro on(match, options \\ [], _do = [do: do_block]) do
+    as = Keyword.get(options, :as, @default_message_name)
+    when_block = Keyword.get(options, :when, true)
+    
+    add_function(match, {as, [], Elixir}, when_block, do_block)
+  end
   
 
-  defp add_function(match_atom, message_alias, do_block) do
+  defp add_function(match, message_alias, when_block, do_block) do
+    match_atom = String.to_atom(match)
     quote do
-      match_string = to_string(unquote(match_atom))
       # raise error if listener match is empty
-      if match_string == "" do
-        raise Telebrew.ListenerError, message: "Event Listener: \'#{match_string}\' cannot be empty"
+      if unquote(match) == "" do
+        raise Telebrew.ListenerError, message: "Event Listener: \'#{unquote(match)}\' cannot be empty"
       end
       # raise error if listener has already been defined
       if unquote(match_atom) in @events do
-        raise Telebrew.ListenerError, message: "Event Listener: \'#{match_string}\' is alread defined"
+        raise Telebrew.ListenerError, message: "Event Listener: \'#{unquote(match)}\' is alread defined"
       end
       # raise error if match is not a valid event and does not start with /
-      if (not String.starts_with?(match_string, "/")) and (not unquote(match_atom) in unquote(@reserved_events)) do
-        msg = "Event Listener: \'#{match_string}\' is not a valid command or event. Perhaps you ment \'/#{match_string}\'"
+      if (not String.starts_with?(unquote(match), "/")) and (not unquote(match_atom) in unquote(@reserved_events)) do
+        msg = "Event Listener: \'#{unquote(match)}\' is not a valid command or event. Perhaps you ment \'/#{unquote(match)}\'"
         raise Telebrew.ListenerError, message: msg
       end
       # raise error if match has a space in it
-      if String.contains?(match_string, [" "]) do
-        raise Telebrew.ListenerError, message: "Event Listener: \'#{match_string}\' should be a single event or command (no spaces allowed)"
+      if String.contains?(unquote(match), [" "]) do
+        raise Telebrew.ListenerError, message: "Event Listener: \'#{unquote(match)}\' should be a single event or command (no spaces allowed)"
       end
 
       @events unquote(match_atom)
 
       def unquote(match_atom)(message) do
         var!(unquote(message_alias)) = message
-        unquote(do_block)
+        if unquote(when_block) do
+          unquote(do_block)  
+        end
       end
     end
   end
