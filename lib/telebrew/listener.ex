@@ -18,6 +18,9 @@ defmodule Telebrew.Listener do
   defmacro __before_compile__(_env) do
     quote do
       def start do
+        IO.puts "\n================="
+        IO.puts "Starting Listener"
+        IO.puts "=================\n"
         Telebrew.Polling.start(self(), __MODULE__, @events)
       end
     end
@@ -30,13 +33,12 @@ defmodule Telebrew.Listener do
   prefixed by '/'.  Events have no prefix and have to be one of the reserved predefined events.
 
   ## Events ##
-  | Name    | Effect                                                | 
-  | ----    | ------                                                |
-  | text    | Will match on any text without a command              |
-  | default | Will match any command that is not previously defined |
-  | photo   | Will match any photo                                  |
-  | sticker | Will match any sticker                                |
-  | audio   | Will match any audio file                             |
+
+  - `text`: Will match on any text without a command
+  - `default`: Will match any command that is not previously defined
+  - `photo`: Will match any photo
+  - `sticker`: Will match any sticker
+  - `audio`: Will match any audio
 
   ## Examples ##
       # will be called on any message prefixed by '/test'
@@ -108,15 +110,7 @@ defmodule Telebrew.Listener do
   def listen(module, events) do
     receive do
       {:update, message} ->
-        IO.puts(
-          "Recieved Message: #{
-            if Map.has_key?(message, :text) do
-              message.text
-            else
-              "No Text"
-            end
-          }"
-        )
+        log_message(message)
 
         cond do
           Map.has_key?(message, :text) and String.starts_with?(message.text, "/") ->
@@ -175,6 +169,28 @@ defmodule Telebrew.Listener do
       true ->
         nil
     end
+  end
+
+  defp log_message(message) do
+    log_message = 
+    cond do
+      Map.has_key?(message, :text) ->
+        message.text
+      Map.has_key?(message, :photo) ->
+        file_id = (List.first(message.photo)).file_id
+        "Photo(#{file_id})"
+      Map.has_key?(message, :sticker) ->
+        emoji = message.sticker.emoji
+        set_name = message.sticker.set_name
+        "Sticker(#{emoji}, #{set_name})"
+      Map.has_key?(message, :audio) ->
+        file_id = message.audio.file_id
+        "Audio(#{file_id})"
+      true ->
+        "Unknown"
+    end
+
+    IO.puts "Received Message: #{log_message}"
   end
 
   defp split_message(message) do

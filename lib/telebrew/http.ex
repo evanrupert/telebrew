@@ -42,6 +42,9 @@ defmodule Telebrew.HTTP do
       {:ok, result} ->
         result
 
+      {:error, %{id: id, reason: reason}} ->
+        raise Telebrew.Error, message: reason, error_code: id
+
       {:error, %{error_code: code, description: des}} ->
         raise Telebrew.Error, message: des, error_code: code
     end
@@ -51,10 +54,13 @@ defmodule Telebrew.HTTP do
 
   defp strings_to_atoms(map) do
     for {key, val} <- map, into: %{} do
-      if is_map(val) do
-        {String.to_atom(key), strings_to_atoms(val)}
-      else
-        {String.to_atom(key), val}
+      case val do
+        list when is_list(list) ->
+          {String.to_atom(key), strings_to_atoms(list)}
+        map when is_map(map) ->
+          {String.to_atom(key), strings_to_atoms(map)}
+        x ->
+          {String.to_atom(key), x}
       end
     end
   end

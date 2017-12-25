@@ -2,7 +2,7 @@ defmodule Telebrew.Methods do
   import Telebrew.HTTP
 
   @docs_address "https://core.telegram.org/bots/api"
-
+  
   @moduledoc """
   This module stores all of the abstractions over the telegram bot api methods
   """
@@ -14,19 +14,16 @@ defmodule Telebrew.Methods do
 
 
   ## Optional Parameters ##
-   
-  | Name                     | Type    | Purpose                                                                                               |
-  | ----                     | ----    | -------                                                                                               | 
-  | parse_mode               | String  | Use "Markdown" or "HTML" to have telegram parse the message with that markup respectivly              |  
-  | disable_web_page_preview | Boolean | Disables website preview if a link is in the message                                                  | 
-  | disable_notification     | Boolean | Disables sound or vibration of the message                                                            |
-  | reply_to_message_id      | Integer | If the message is a reply, ID of the original message                                                 |
-  | reply_markup             | Map     | Additional interface options, see #{@docs_address} for more information about the type                |
+
+  - `parse_mode`: (String) Use "Markdown" or "HTML" to have telegram parse the message with the respective markdown style
+  - `disable_web_page_preview`: (Boolean) Disables preview of webpages when a link is in the message
+  - `disable_notification`: (Boolean) Disables sound or vibration of the message
+  - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendMessage) for more information about this option
 
   ## Example ##
       # will send the message "Hello" to the chat_id 123456789 without a notification
       send_message(123456789, "Hello", disable_notification: true)
-
 
   """
   def send_message(chat_id, message, params \\ []) do
@@ -49,7 +46,7 @@ defmodule Telebrew.Methods do
   end
 
   @doc """
-  Same as `send_message/2` but will throw `Telebrew.Error` exception on failure
+  Same as `send_message/2` but will raise `Telebrew.Error` exception on failure
   """
   def send_message!(chat_id, message, params \\ []) do
     send_message(chat_id, message, params)
@@ -62,7 +59,7 @@ defmodule Telebrew.Methods do
   def get_me(), do: request("getMe", %{})
 
   @doc """
-  Same as `get_me/0` but will throw `Telebrew.Error` exception on failure
+  Same as `get_me/0` but will raise `Telebrew.Error` exception on failure
   """
   def get_me!(), do: request("getMe", %{}) |> check_error
 
@@ -71,8 +68,7 @@ defmodule Telebrew.Methods do
 
   ## Optional Parameters ##
 
-  | Name                 | Type    | Purpose                                  |
-  | disable_notification | Boolean | Disables notification sound or vibration |
+  - `disable_notification`: (Boolean) Disables notification sound or vibration
   """
   def forward_message(chat_id, from_chat_id, message_id, params \\ []) do
     # TODO: test this somehow
@@ -88,13 +84,28 @@ defmodule Telebrew.Methods do
   end
 
   @doc """
-  Same as `forward_message/3` but will throw `Telebrew.Error` on failure
+  Same as `forward_message/3` but will raise `Telebrew.Error` on failure
   """
   def forward_message!(chat_id, from_chat, message_id, params \\ []) do
     forward_message(chat_id, from_chat, message_id, params)
     |> check_error
   end
+  @doc """
+  Sends a photo to the given chat_id
 
+  ## Optional Parameters ##
+    - `caption`: (String) Photo caption 0-200 characters
+    - `disable_notification`: (Boolean) Sends message without sound or vibration
+    - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
+    - `reply_markup`: (Map) Additional interface options go [here](#{@docs_address}#sendPhoto) for more info
+  
+  ## Example ##
+      # will echo a photo back to the user with the caption "echo"
+      on "photo" do
+        photo = List.first m.photo
+        send_photo m.chat.id, photo.file_id, caption: "echo"
+      end
+  """
   def send_photo(chat_id, photo, params \\ []) do
     json_body =
       %{
@@ -109,8 +120,46 @@ defmodule Telebrew.Methods do
     request("sendPhoto", json_body)
   end
 
+  @doc """
+  Same as `send_photo/2` but will raise `Telebrew.Error` on failure
+  """
   def send_photo!(chat_id, photo, params \\ []) do
     send_photo(chat_id, photo, params)
+    |> check_error
+  end
+
+  @doc """
+  Sends an audio file to the given chat_id
+
+  ## Optional Parameters ##
+  - `caption`: (String) Caption for audio file, 0-200 characters
+  - `duration`: (Integer) Duration of audio in seconds
+  - `performer`: (String) Performer of audio
+  - `title`: (String) Title of audio
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Boolean) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  """
+  def send_audio(chat_id, audio, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        audio: audio
+      }
+      |> add_optional_params(
+        [:caption, :duration, :performer, :title, :disable_notification,
+         :reply_to_message_id, :reply_markup],
+         params
+      )
+
+    request("sendAudio", json_body)
+  end
+
+  @doc """
+  Same as `send_audio/2` but will raise `Telebrew.Error` on failure
+  """
+  def send_audio!(chat_id, audio, params \\ []) do
+    send_audio(chat_id, audio, params)
     |> check_error
   end
 
