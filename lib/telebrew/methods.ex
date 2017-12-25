@@ -11,7 +11,7 @@ defmodule Telebrew.Methods do
   Sends a message to the given chat_id
 
   Returns { :ok, result } where result is a [Message](#{@docs_address}#message) or { :error, reason }
-  
+
 
   ## Optional Parameters ##
    
@@ -30,16 +30,22 @@ defmodule Telebrew.Methods do
 
   """
   def send_message(chat_id, message, params \\ []) do
-    optional_params = [:parse_mode, :disable_web_page_preview, :disable_notification, :reply_to_message_id, :reply_markup]
+    optional_params = [
+      :parse_mode,
+      :disable_web_page_preview,
+      :disable_notification,
+      :reply_to_message_id,
+      :reply_markup
+    ]
 
-    json_body = %{
-                  chat_id: chat_id,
-                  text: message
-                } 
-                |> add_optional_params(optional_params, params)
+    json_body =
+      %{
+        chat_id: chat_id,
+        text: message
+      }
+      |> add_optional_params(optional_params, params)
 
     request("sendMessage", json_body)
-  
   end
 
   @doc """
@@ -60,27 +66,26 @@ defmodule Telebrew.Methods do
   """
   def get_me!(), do: request("getMe", %{}) |> check_error
 
-
   @doc """
   Forward messages of any kind
 
   ## Optional Parameters ##
-  
+
   | Name                 | Type    | Purpose                                  |
   | disable_notification | Boolean | Disables notification sound or vibration |
   """
   def forward_message(chat_id, from_chat_id, message_id, params \\ []) do
     # TODO: test this somehow
-    json_body = %{
-      chat_id: chat_id,
-      from_chat_id: from_chat_id,
-      message_id: message_id
-    }
-    |> add_optional_params([:disable_notification], params)
+    json_body =
+      %{
+        chat_id: chat_id,
+        from_chat_id: from_chat_id,
+        message_id: message_id
+      }
+      |> add_optional_params([:disable_notification], params)
 
     request("forwardMessage", json_body)
   end
-
 
   @doc """
   Same as `forward_message/3` but will throw `Telebrew.Error` on failure
@@ -90,37 +95,42 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
-
   def send_photo(chat_id, photo, params \\ []) do
-    json_body = %{
-      chat_id: chat_id,
-      photo: photo
-    }
-    |> add_optional_params([:caption, :disable_notification,
-                            :reply_to_message_id, :reply_markup], 
-                            params)
+    json_body =
+      %{
+        chat_id: chat_id,
+        photo: photo
+      }
+      |> add_optional_params(
+        [:caption, :disable_notification, :reply_to_message_id, :reply_markup],
+        params
+      )
+
     request("sendPhoto", json_body)
   end
 
-  
   def send_photo!(chat_id, photo, params \\ []) do
     send_photo(chat_id, photo, params)
     |> check_error
   end
 
+  defp check_error({:ok, resp}), do: resp
 
-  defp check_error({ :ok, resp }), do: resp
-  defp check_error({ :error, %{error_code: c, description: d } }) do
+  defp check_error({:error, %{error_code: c, description: d}}) do
     raise Telebrew.Error, message: d, error_code: c
   end
-
 
   defp add_optional_params(map, param_names, params) do
     # Enum.reduce over the list of optional parameters, if it is not nil add it to the parameter map
     param_names
-    |> Enum.reduce(map, fn(name, acc) ->
+    |> Enum.reduce(map, fn name, acc ->
       val = Keyword.get(params, name)
-      if val != nil do Map.put(acc, name, val) else acc end
+
+      if val != nil do
+        Map.put(acc, name, val)
+      else
+        acc
+      end
     end)
   end
 end

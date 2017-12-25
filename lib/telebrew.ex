@@ -3,9 +3,7 @@ defmodule Telebrew do
   Documentation for Telebrew.
   """
 
-
   def main(_argv) do
-    IO.puts "Hello, World!"
+    IO.puts("Hello, World!")
   end
-
 end

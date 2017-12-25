@@ -15,6 +15,7 @@ defmodule Telebrew.Error do
   Returns the message field of the error
   """
   def message(%__MODULE__{message: m}), do: inspect(m)
+
   @doc """
   Returns the error_code field of the error
   """
