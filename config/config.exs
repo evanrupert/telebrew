@@ -31,4 +31,5 @@ use Mix.Config
 
 
 config :telebrew,
-  api_key: "469344097:AAGAEDkgFnL2hSvCy9c6muxsJSdUVyC4E-I"
+  api_key: "469344097:AAGAEDkgFnL2hSvCy9c6muxsJSdUVyC4E-I",
+  polling_interval: 500

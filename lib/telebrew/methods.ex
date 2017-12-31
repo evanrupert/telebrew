@@ -163,6 +163,42 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  @doc """
+  Sends general files up to 50 MB in size
+
+  ## Optional Parameters ##
+  - `caption`: (String) Document caption
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  """
+  def send_document(chat_id, document, params \\ []) do
+    json_body = 
+      %{
+        chat_id: chat_id,
+        document: document
+      }
+      |> add_optional_params(
+        [:caption, :disable_notification, :reply_to_message_id,
+         :reply_markup],
+         params
+      )
+
+      request("sendDocument", json_body)
+  end
+
+  @doc """
+  Same as `send_document/2` but will raise `Telebrew.Error` on failure
+  """
+  def send_document!(chat_id, document, params \\ []) do
+    send_document(chat_id, document, params)
+    |> check_error
+  end
+
+
+  # Helper Functions
+
+
   defp check_error({:ok, resp}), do: resp
 
   defp check_error({:error, %{error_code: c, description: d}}) do
