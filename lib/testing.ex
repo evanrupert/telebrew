@@ -5,6 +5,10 @@ defmodule Testing do
     send_message(m.chat.id, "System is up")
   end
 
+  on "video" do
+    send_video(m.chat.id, m.video.file_id, caption: "Echo")
+  end
+
   on "photo" do
     photo = List.first m.photo
     

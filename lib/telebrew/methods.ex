@@ -195,6 +195,42 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  @doc """
+  Sends video files, supports mp4 videos (other formats will be sent as a Document)
+
+  
+  ## Optional Parameters ##
+  - `duration`: (Integer) Duration of send video in seconds
+  - `width`: (Integer) Video width
+  - `height`: (Integer) Video height
+  - `caption`: (String) Video caption 0-200 characters
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  """
+  def send_video(chat_id, video, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        video: video
+      }
+      |> add_optional_params(
+        [:duration, :width, :height, :caption, :disable_notification,
+         :reply_to_message_id, :reply_markup],
+         params
+      )
+
+      request("sendVideo", json_body)
+  end
+
+  @doc """
+  Same as `send_video/2` but will raise `Telebrew.Error` on failure
+  """
+  def send_video!(chat_id, video, params \\ []) do
+    send_video(chat_id, video, params)
+    |> check_error
+  end
+
 
   # Helper Functions
 

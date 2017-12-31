@@ -2,7 +2,8 @@ defmodule Telebrew do
 @moduledoc """
   Contains all macros for defining message event listeners
   """
-  @reserved_events [:text, :default, :photo, :sticker, :audio, :document]
+  @reserved_events [:text, :default, :photo, :sticker, :audio, 
+                    :document, :video]
   @default_message_name :m
 
   defmacro __using__(_opts) do
@@ -41,7 +42,9 @@ defmodule Telebrew do
   - `default`: Will match any command that is not previously defined
   - `photo`: Will match any photo
   - `sticker`: Will match any sticker
-  - `audio`: Will match any audio
+  - `audio`: Will match any audio file
+  - `video`: Will match any video file
+  - `document`: Will match any other type of file
 
   ## Examples ##
       # will be called on any message prefixed by '/test'
