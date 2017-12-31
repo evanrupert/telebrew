@@ -19,4 +19,8 @@ defmodule Testing do
     send_audio m.chat.id, m.audio.file_id, caption: "Echo"
   end
 
+  on "document" do
+    send_message(m.chat.id, "Document received")
+  end
+
 end

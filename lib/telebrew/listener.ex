@@ -56,6 +56,10 @@ defmodule Telebrew.Listener do
       Map.has_key?(message, :audio) and Keyword.has_key?(module.__info__(:functions), :audio) ->
         spawn(module, :audio, [message])
 
+      # if message is a document and module has document event listener call document listener
+      Map.has_key?(message, :document) and Keyword.has_key?(module.__info__(:functions), :document) ->
+        spawn(module, :document, [message])
+
       # if message has text and text listener exists call text listener
       Map.has_key?(message, :text) and Keyword.has_key?(module.__info__(:functions), :text) ->
         spawn(module, :text, [message])
@@ -81,6 +85,9 @@ defmodule Telebrew.Listener do
       Map.has_key?(message, :audio) ->
         file_id = message.audio.file_id
         "Audio(#{file_id})"
+      Map.has_key?(message, :document) ->
+        file_id = message.document.file_id
+        "Document(#{file_id})"
       true ->
         "Unknown"
     end
