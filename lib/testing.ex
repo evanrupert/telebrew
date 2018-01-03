@@ -26,11 +26,18 @@ defmodule Testing do
   end
 
   on "audio" do
-    send_voice m.chat.id, m.audio.file_id, caption: "Voiceified"
+    send_message m.chat.id, "Received message"
   end
 
   on "document" do
     send_message m.chat.id, "Document received" 
+  end
+
+  on "location" do
+    lat = m.location.latitude
+    lon = m.location.longitude
+
+    send_location m.chat.id, lat, lon
   end
 
 end

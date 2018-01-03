@@ -1,6 +1,10 @@
 defmodule Telebrew.Listener do
   use GenServer
 
+  @reserved_events [:text, :default, :photo, :sticker, :audio, 
+                    :document, :video, :video_note, :voice,
+                    :location]
+
   def init(args) do
     {:ok, args}
   end
@@ -43,44 +47,15 @@ defmodule Telebrew.Listener do
   end
 
   defp handle_event(module, message) do
-    cond do
-      # Match photo message
-      Map.has_key?(message, :photo) and has_fn(module, :photo) ->
-        spawn(module, :photo, [message])
-
-      # Match sticker
-      Map.has_key?(message, :sticker) and has_fn(module, :sticker) ->
-        spawn(module, :sticker, [message])
-
-      # Match audio file
-      Map.has_key?(message, :audio) and has_fn(module, :audio) ->
-        spawn(module, :audio, [message])
-
-      # Match voice message
-      Map.has_key?(message, :voice) and has_fn(module, :voice) ->
-        spawn(module, :voice, [message])
-
-      # Match video file
-      Map.has_key?(message, :video) and has_fn(module, :video) ->
-        spawn(module, :video, [message])
-
-      # Match video note
-      Map.has_key?(message, :video_note) and has_fn(module, :video_note) ->
-        spawn(module, :video_note, [message])
-
-      # Match document
-      Map.has_key?(message, :document) and has_fn(module, :document) ->
-        spawn(module, :document, [message])
-
-      # if message has text and text listener exists call text listener
-      Map.has_key?(message, :text) and has_fn(module, :text) ->
-        spawn(module, :text, [message])
-
-      # if none of the previous conditions then do nothing
-      true ->
-        nil
+    # check for all possible events
+    for event <- @reserved_events do
+      # call listener if message contains that event and that event has a listener defined
+      if Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
+        spawn(module, event, [message])
+      end
     end
   end
+
 
   defp log_message(message) do
     log_message = 
@@ -109,6 +84,10 @@ defmodule Telebrew.Listener do
       Map.has_key?(message, :video_note) ->
         file_id = message.video_note.file_id
         "Video Note(#{file_id})"
+      Map.has_key?(message, :location) ->
+        lat = message.location.latitude
+        lon = message.location.longitude
+        "Location(#{lat}, #{lon})"
       true ->
         # DEBUG
         IO.inspect message
@@ -116,10 +95,6 @@ defmodule Telebrew.Listener do
     end
 
     IO.puts "Received Message: #{log_message}"
-  end
-
-  defp has_fn(module, function) do
-    Keyword.has_key?(module.__info__(:functions), function)
   end
 
   defp split_message(message) do

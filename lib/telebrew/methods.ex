@@ -331,6 +331,39 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  @doc """
+  Sends a location in the form of a latitude and longitude
+
+  ## Optional Parameters ##
+  - `live_period`: (Integer) Period in seconds for which the location will be updated
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendlocation) for more information
+  """
+  def send_location(chat_id, latitude, longitude, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        latitude: latitude,
+        longitude: longitude
+      }
+      |> add_optional_params(
+        [:live_period, :disable_notification, 
+         :reply_to_message_id, :reply_markup],
+         params
+      )
+
+      request("sendLocation", json_body)
+  end
+
+  @doc """
+  Same as `send_location/2` but will raise `Telebrew.Error` on failure
+  """
+  def send_location!(chat_id, latitude, longitude, params \\ []) do
+    send_location(chat_id, latitude, longitude, params)
+    |> check_error
+  end
+
 
   # Helper Functions
 
