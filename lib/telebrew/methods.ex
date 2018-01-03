@@ -267,7 +267,40 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
-  
+  @doc """
+  Sends a video note(small square autoplay videos) that is up to 1 minute long
+
+  ## Optional Parameters ##
+  - `duration`: (Integer) Duration of video in seconds
+  - `length`: (Integer) Video height and width
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  """
+  def send_video_note(chat_id, video_note, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        video_note: video_note
+      }
+      |> add_optional_params(
+        [:duration, :length, :disable_notification,
+         :reply_to_message_id, :reply_markup],
+         params
+      )
+
+      request("sendVideoNote", json_body)
+  end
+
+  @doc """
+  Same as `send_video_note/2` but will raise `Telebrew.Error` on failure
+  """
+  def send_video_note!(chat_id, video_note, params \\ []) do
+    send_video_note(chat_id, video_note, params)
+    |> check_error
+  end
+
+
   # Helper Functions
 
 

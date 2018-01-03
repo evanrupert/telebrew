@@ -44,28 +44,36 @@ defmodule Telebrew.Listener do
 
   defp handle_event(module, message) do
     cond do
-      # message has photo and module has photo listener call photo listener
-      Map.has_key?(message, :photo) and Keyword.has_key?(module.__info__(:functions), :photo) ->
+      # Match photo message
+      Map.has_key?(message, :photo) and has_fn(module, :photo) ->
         spawn(module, :photo, [message])
 
-      # if message is sticker and module has sticker listener call sticker listener
-      Map.has_key?(message, :sticker) and Keyword.has_key?(module.__info__(:functions), :sticker) ->
+      # Match sticker
+      Map.has_key?(message, :sticker) and has_fn(module, :sticker) ->
         spawn(module, :sticker, [message])
 
-      # if message is audio and module has audio listener call audio listener
-      Map.has_key?(message, :audio) and Keyword.has_key?(module.__info__(:functions), :audio) ->
+      # Match audio file
+      Map.has_key?(message, :audio) and has_fn(module, :audio) ->
         spawn(module, :audio, [message])
 
-      # if message is a document and module has document event listener call document listener
-      Map.has_key?(message, :document) and Keyword.has_key?(module.__info__(:functions), :document) ->
+      # Match voice message
+      Map.has_key?(message, :voice) and has_fn(module, :voice) ->
+        spawn(module, :voice, [message])
+
+      # Match video file
+      Map.has_key?(message, :video) and has_fn(module, :video) ->
+        spawn(module, :video, [message])
+
+      # Match video note
+      Map.has_key?(message, :video_note) and has_fn(module, :video_note) ->
+        spawn(module, :video_note, [message])
+
+      # Match document
+      Map.has_key?(message, :document) and has_fn(module, :document) ->
         spawn(module, :document, [message])
 
-      # if message is a video and module has video event listener call video listener
-      Map.has_key?(message, :video) and Keyword.has_key?(module.__info__(:functions), :video) ->
-        spawn(module, :video, [message])      
-
       # if message has text and text listener exists call text listener
-      Map.has_key?(message, :text) and Keyword.has_key?(module.__info__(:functions), :text) ->
+      Map.has_key?(message, :text) and has_fn(module, :text) ->
         spawn(module, :text, [message])
 
       # if none of the previous conditions then do nothing
@@ -89,12 +97,18 @@ defmodule Telebrew.Listener do
       Map.has_key?(message, :audio) ->
         file_id = message.audio.file_id
         "Audio(#{file_id})"
+      Map.has_key?(message, :voice) ->
+        file_id = message.voice.file_id
+        "Voice(#{file_id})"
       Map.has_key?(message, :document) ->
         file_id = message.document.file_id
         "Document(#{file_id})"
       Map.has_key?(message, :video) ->
         file_id = message.video.file_id
         "Video(#{file_id})"
+      Map.has_key?(message, :video_note) ->
+        file_id = message.video_note.file_id
+        "Video Note(#{file_id})"
       true ->
         # DEBUG
         IO.inspect message
@@ -102,6 +116,10 @@ defmodule Telebrew.Listener do
     end
 
     IO.puts "Received Message: #{log_message}"
+  end
+
+  defp has_fn(module, function) do
+    Keyword.has_key?(module.__info__(:functions), function)
   end
 
   defp split_message(message) do

@@ -9,8 +9,12 @@ defmodule Testing do
     send_message m.chat.id, "Received text"
   end
 
-  on "video" do
-    send_message m.chat.id, "Received video"
+  on "video_note" do
+    send_video_note m.chat.id, m.video_note.file_id
+  end
+
+  on "voice" do
+    send_voice m.chat.id, m.voice.file_id
   end
 
   on "photo" do
