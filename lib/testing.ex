@@ -18,7 +18,7 @@ defmodule Testing do
   end
 
   on "photo" do
-    send_message m.chat.id, "Received photo"
+    send_message m.chat.id, "Received Photo"
   end
 
   on "sticker" do

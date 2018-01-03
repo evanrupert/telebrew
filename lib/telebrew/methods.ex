@@ -19,7 +19,7 @@ defmodule Telebrew.Methods do
   - `disable_web_page_preview`: (Boolean) Disables preview of webpages when a link is in the message
   - `disable_notification`: (Boolean) Disables sound or vibration of the message
   - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
-  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendMessage) for more information about this option
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendmessage) for more information about this option
 
   ## Example ##
       # will send the message "Hello" to the chat_id 123456789 without a notification
@@ -97,7 +97,7 @@ defmodule Telebrew.Methods do
     - `caption`: (String) Photo caption 0-200 characters
     - `disable_notification`: (Boolean) Sends message without sound or vibration
     - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
-    - `reply_markup`: (Map) Additional interface options go [here](#{@docs_address}#sendPhoto) for more info
+    - `reply_markup`: (Map) Additional interface options go [here](#{@docs_address}#sendphoto) for more info
   
   ## Example ##
       # will echo a photo back to the user with the caption "echo"
@@ -138,7 +138,7 @@ defmodule Telebrew.Methods do
   - `title`: (String) Title of audio
   - `disable_notification`: (Boolean) Sends message without sound or vibration
   - `reply_to_message_id`: (Boolean) If message is a reply, ID of he original message
-  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendaudio) for more information
   """
   def send_audio(chat_id, audio, params \\ []) do
     json_body =
@@ -170,7 +170,7 @@ defmodule Telebrew.Methods do
   - `caption`: (String) Document caption
   - `disable_notification`: (Boolean) Sends message without sound or vibration
   - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
-  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#senddocument) for more information
   """
   def send_document(chat_id, document, params \\ []) do
     json_body = 
@@ -206,7 +206,7 @@ defmodule Telebrew.Methods do
   - `caption`: (String) Video caption 0-200 characters
   - `disable_notification`: (Boolean) Sends message without sound or vibration
   - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
-  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendvideo) for more information
   """
   def send_video(chat_id, video, params \\ []) do
     json_body =
@@ -242,7 +242,7 @@ defmodule Telebrew.Methods do
   - `duration`: (Integer) Duration of voice message in seconds
   - `disable_notification`: (Boolean) Sends message without sound or vibration
   - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
-  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendvoice) for more information
   """
   def send_voice(chat_id, voice, params \\ []) do
     json_body =
@@ -275,7 +275,7 @@ defmodule Telebrew.Methods do
   - `length`: (Integer) Video height and width
   - `disable_notification`: (Boolean) Sends message without sound or vibration
   - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
-  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendvideonote) for more information
   """
   def send_video_note(chat_id, video_note, params \\ []) do
     json_body =
@@ -297,6 +297,37 @@ defmodule Telebrew.Methods do
   """
   def send_video_note!(chat_id, video_note, params \\ []) do
     send_video_note(chat_id, video_note, params)
+    |> check_error
+  end
+
+  @doc """
+  Sends a group of photos or videos as an album. On success an array of messages is returned
+
+  The second parameter `media` is of type InputMedia described [here](#{@docs_address}#inputmedia)
+
+  ## Optional Parameters ##
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  """
+  def send_media_group(chat_id, media, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        media: media
+      }
+      |> add_optional_params(
+        [:disable_notification, :reply_to_message_id],
+        params
+      )
+
+      request("sendMediaGroup", json_body)
+  end
+
+  @doc """
+  Same as `send_media_group/2` but will raise `Telebrew.Error` on failure
+  """
+  def send_media_group!(chat_id, media, params \\ []) do
+    send_media_group(chat_id, media, params)
     |> check_error
   end
 
