@@ -2,17 +2,19 @@ defmodule Testing do
   use Telebrew
 
   on "/test" do
-    send_message(m.chat.id, "System is up")
+    send_message m.chat.id, "System is up"
+  end
+
+  on "text" do
+    send_message m.chat.id, "Received text"
   end
 
   on "video" do
-    send_video(m.chat.id, m.video.file_id, caption: "Echo")
+    send_message m.chat.id, "Received video"
   end
 
   on "photo" do
-    photo = List.first m.photo
-    
-    send_photo! m.chat.id, photo.file_id, caption: "Echo"
+    send_message m.chat.id, "Received photo"
   end
 
   on "sticker" do
@@ -20,11 +22,11 @@ defmodule Testing do
   end
 
   on "audio" do
-    send_audio m.chat.id, m.audio.file_id, caption: "Echo"
+    send_voice m.chat.id, m.audio.file_id, caption: "Voiceified"
   end
 
   on "document" do
-    send_message(m.chat.id, "Document received")
+    send_message m.chat.id, "Document received" 
   end
 
 end

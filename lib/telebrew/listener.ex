@@ -96,6 +96,8 @@ defmodule Telebrew.Listener do
         file_id = message.video.file_id
         "Video(#{file_id})"
       true ->
+        # DEBUG
+        IO.inspect message
         "Unknown"
     end
 

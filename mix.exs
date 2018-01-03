@@ -11,14 +11,12 @@ defmodule Telebrew.Mixfile do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger, :httpoison]
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
       {:httpoison, "~> 0.13.0"},
@@ -51,3 +49,11 @@ end
 
 # TODO: do some process supervison thing to restart the process
 # that keeps timing out
+
+# TODO: add optional list parameter to match `on` macro to match on any of the given options
+# on ["photo", "video"] do
+#   send_message m.chat.id, "Received visual asset"
+# end 
+
+# TODO: test `send_voice/2` and voice event with someone who has an iphone
+

@@ -231,7 +231,43 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  @doc """
+  Use to send audio files that the telegram client will display as a playable
+  voice message
 
+  The audio must be in an .ogg file encoded with OPUS and be no larger than 50 MB
+
+  ## Optional Parameters ##
+  - `caption`: (String) Voice message caption, 0-200 characters
+  - `duration`: (Integer) Duration of voice message in seconds
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendAudio) for more information
+  """
+  def send_voice(chat_id, voice, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        voice: voice
+      }
+      |> add_optional_params(
+        [:caption, :duration, :disable_notification,
+         :reply_to_message_id, :reply_markup],
+         params
+      )
+
+    request("sendVoice", json_body)
+  end
+
+  @doc """
+  Same as `send_voice/2` but will raise `Telebrew.Error` on failure
+  """
+  def send_voice!(chat_id, voice, params \\ []) do
+    send_voice(chat_id, voice, params) 
+    |> check_error
+  end
+
+  
   # Helper Functions
 
 
