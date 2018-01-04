@@ -55,5 +55,13 @@ end
 #   send_message m.chat.id, "Received visual asset"
 # end 
 
-# TODO: test `send_voice/2` and voice event with someone who has an iphone
-
+# TODO: add a state parameter that is passed to every listener and can be updated like react does
+# on "/start" do 
+#   0
+# end
+#
+# on "default" do
+#   msg_num = state + 1
+#   send_message m.chat.id, "This is message number: #{msg_num}"
+#   msg_num
+# end

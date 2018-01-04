@@ -5,6 +5,7 @@ defmodule Telebrew do
   @reserved_events [:text, :default, :photo, :sticker, :audio, 
                     :document, :video, :video_note, :voice,
                     :location]
+
   @default_message_name :m
 
   defmacro __using__(_opts) do
@@ -23,8 +24,10 @@ defmodule Telebrew do
         IO.puts "\n================="
         IO.puts "Starting Listener"
         IO.puts "=================\n"
-        
-        {:ok, listener_pid} = GenServer.start_link(Telebrew.Listener, {__MODULE__, @events})
+
+        state = if @init do @init else nil end
+
+        {:ok, listener_pid} = GenServer.start_link(Telebrew.Listener, {__MODULE__, @events, state})
 
         Task.start(Telebrew.Polling, :run, [listener_pid])
       end
@@ -104,11 +107,14 @@ defmodule Telebrew do
 
       @events unquote(match_atom)
 
-      def unquote(match_atom)(message) do
+      def unquote(match_atom)(message, state) do
         var!(unquote(message_alias)) = message
+        var!(state) = state
 
         if unquote(when_block) do
           unquote(do_block)
+        else
+          state
         end
       end
     end
