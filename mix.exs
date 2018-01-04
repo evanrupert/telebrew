@@ -31,8 +31,8 @@ end
 
 # TODO: implement all methods in the telegram bot api
 
-# TODO: implement when guard by just translating that to the func def
-# when guard in the generated code
+# TODO: implement when guard by using macros to define a new guard function
+# and then use that function in the when guard for the generated function
 
 # TODO: test repeat match declarations and stuff like that and then implement validation for that
 
@@ -53,15 +53,4 @@ end
 # TODO: add optional list parameter to match `on` macro to match on any of the given options
 # on ["photo", "video"] do
 #   send_message m.chat.id, "Received visual asset"
-# end 
-
-# TODO: add a state parameter that is passed to every listener and can be updated like react does
-# on "/start" do 
-#   0
-# end
-#
-# on "default" do
-#   msg_num = state + 1
-#   send_message m.chat.id, "This is message number: #{msg_num}"
-#   msg_num
 # end
