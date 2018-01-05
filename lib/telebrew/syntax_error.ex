@@ -1,4 +1,4 @@
-defmodule Telebrew.ListenerError do
+defmodule Telebrew.SyntaxError do
   @moduledoc """
   Module that contains the main error for all event listener syntex errors
   """

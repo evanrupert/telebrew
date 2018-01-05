@@ -4,7 +4,6 @@ defmodule Telebrew.HTTP do
   """
 
   @url_base "https://api.telegram.org/bot"
-  @api_key Application.get_env(:telebrew, :api_key)
 
   @doc """
   Basic function to send a post request to the telegram bot api where the method is a string of the method name and
@@ -13,12 +12,23 @@ defmodule Telebrew.HTTP do
   Returns either `{ :ok, result }` or `{ :error, reason }`
   """
   def request(method, body) do
+
+    # get api key
+    api_key = Application.get_env(:telebrew, :api_key)
+
+    # check if api key is valid
+    unless api_key do
+      raise Telebrew.SyntaxError, message: "Api key is not configured"
+    end
+
     json_body = Poison.encode!(body)
 
     headers = [{"Content-type", "application/json"}]
 
-    response = HTTPoison.post("#{@url_base}#{@api_key}/#{method}", json_body, headers)
+    # post method and get response
+    response = HTTPoison.post("#{@url_base}#{api_key}/#{method}", json_body, headers)
 
+    # check for errors
     case response do
       {:ok, resp} ->
         case Poison.decode!(resp.body) do

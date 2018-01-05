@@ -84,13 +84,13 @@ defmodule Telebrew do
     quote do
       # raise error if listener match is empty
       if unquote(match) == "" do
-        raise Telebrew.ListenerError,
+        raise Telebrew.SyntaxError,
           message: "Event Listener: \'#{unquote(match)}\' cannot be empty"
       end
 
       # raise error if listener has already been defined
       if unquote(match_atom) in @events do
-        raise Telebrew.ListenerError,
+        raise Telebrew.SyntaxError,
           message: "Event Listener: \'#{unquote(match)}\' is alread defined"
       end
 
@@ -102,12 +102,12 @@ defmodule Telebrew do
             unquote(match)
           }\'"
 
-        raise Telebrew.ListenerError, message: msg
+        raise Telebrew.SyntaxError, message: msg
       end
 
       # raise error if match has a space in it
       if String.contains?(unquote(match), [" "]) do
-        raise Telebrew.ListenerError,
+        raise Telebrew.SyntaxError,
           message:
             "Event Listener: \'#{unquote(match)}\' should be a single event or command (no spaces allowed)"
       end
