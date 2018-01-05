@@ -19,7 +19,7 @@ defmodule Telebrew.Mixfile do
 
   def application do
     [
-      extra_applications: [:httpoison]
+      extra_applications: [:logger, :httpoison]
     ]
   end
 

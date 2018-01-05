@@ -1,6 +1,8 @@
 defmodule Telebrew.Listener do
   use GenServer
 
+  require Logger
+
   @reserved_events [:text, :default, :photo, :sticker, :audio, 
                     :document, :video, :video_note, :voice,
                     :location]
@@ -98,7 +100,7 @@ defmodule Telebrew.Listener do
         "Unknown"
     end
 
-    IO.puts "Received Message: #{log_message}"
+    Logger.info "Received Message: #{log_message}"
   end
 
   defp split_message(message) do
