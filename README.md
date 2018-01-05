@@ -1,6 +1,6 @@
 # Telebrew
 
-**TODO: Add description**
+**STILL IN PROGRESS, DO NOT USE**
 
 ## Installation
 
