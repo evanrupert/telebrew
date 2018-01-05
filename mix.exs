@@ -34,7 +34,7 @@ defmodule Telebrew.Mixfile do
 
   defp package do
     [
-      files: ~w(lib mix.exs LICENCE)
+      files: ~w(lib mix.exs LICENCE),
       maintainers: ["Evan Rupert"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/evanrupert/telebrew"}
