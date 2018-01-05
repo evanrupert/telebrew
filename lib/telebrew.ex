@@ -6,9 +6,6 @@ defmodule Telebrew do
                     :document, :video, :video_note, :voice,
                     :location]
 
-  @default_message_name :m
-
-
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__)
@@ -42,7 +39,7 @@ defmodule Telebrew do
   @doc """
   Main macro used for defining event listeners.
   The first argument is a string that defines what commmand or event will invoke this macro.  The default message variable is m 
-  meaning that one only needs to use m as the received messageCommands are 
+  meaning that one only needs to use m as the received message.  Commands are 
   prefixed by '/'.  Events have no prefix and have to be one of the reserved predefined events.
 
   ## Events ##
@@ -64,26 +61,25 @@ defmodule Telebrew do
         send_message m.chat.id, "Hello"
       end
 
-      # will be called on any message without a command
-      on "text" do
-        send_message m.chat.id, "You said: \#{m.text}"
+      # will be called on any video
+      on "video" do
+        send_message m.chat.id, "Received photo with id: \#{m.photo.file_id}"
       end
   """
   defmacro on(match, options \\ [], _do = [do: do_block]) do
-    as = Keyword.get(options, :as, @default_message_name)
     when_block = Keyword.get(options, :when, true)
 
     # if given match is a list create multiple identical functions with different names
     if is_list(match) do
       for m <- match do
-        add_function(m, {as, [], Elixir}, when_block, do_block)
+        add_function(m, when_block, do_block)
       end
     else
-      add_function(match, {as, [], Elixir}, when_block, do_block)
+      add_function(match, when_block, do_block)
     end
   end
 
-  defp add_function(match, message_alias, when_block, do_block) do
+  defp add_function(match, when_block, do_block) do
     match_atom = String.to_atom(match)
 
     quote do
@@ -117,12 +113,13 @@ defmodule Telebrew do
             "Event Listener: \'#{unquote(match)}\' should be a single event or command (no spaces allowed)"
       end
 
+      # add defined event to events list
       @events unquote(match_atom)
 
       # If init is defined, then define state in the macro therefore warning them if a listener does not use state
       if @init != nil do
         def unquote(match_atom)(message, state) do
-          var!(unquote(message_alias)) = message
+          var!(m) = message
           var!(state) = state
   
           if unquote(when_block) do
@@ -135,7 +132,7 @@ defmodule Telebrew do
       # if init is not defined, than do not define state preventing a bunch of warnings about state not being defined
       else
         def unquote(match_atom)(message, _state) do
-          var!(unquote(message_alias)) = message
+          var!(m) = message
 
           if unquote(when_block) do
             unquote(do_block)

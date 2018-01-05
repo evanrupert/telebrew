@@ -1,30 +1,34 @@
 defmodule Testing do
   use Telebrew
 
-  @init 0
+  @init []
 
   on "/test" do
     send_message m.chat.id, "System is up"
-    
+
     state
   end
 
-  on ["/get", "/g"] do
-    send_message m.chat.id, state
+  on "/add" do
+    send_message m.chat.id, "Item added"
+
+    [ m.text | state ]
+  end
+
+  on "/remove" do
+    send_message m.chat.id, "Last item removed"
+
+    [ _ | t ] = state
+    t 
+  end
+
+  on "/list" do
+    send_message m.chat.id, "ALL ITEMS"
     
+    for item <- Enum.reverse(state) do
+      send_message m.chat.id, item
+    end
+
     state
   end
-
-  on ["/increase", "/i"] do
-    send_message m.chat.id, "State increased"
-
-    state + 1
-  end
-
-  on ["/decrease", "/d"] do
-    send_message m.chat.id, "State decreased"
-
-    state - 1
-  end
-  
 end
