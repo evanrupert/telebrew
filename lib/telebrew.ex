@@ -68,7 +68,14 @@ defmodule Telebrew do
     as = Keyword.get(options, :as, @default_message_name)
     when_block = Keyword.get(options, :when, true)
 
-    add_function(match, {as, [], Elixir}, when_block, do_block)
+    # if given match is a list create multiple identical functions with different names
+    if is_list(match) do
+      for m <- match do
+        add_function(m, {as, [], Elixir}, when_block, do_block)
+      end
+    else
+      add_function(match, {as, [], Elixir}, when_block, do_block)
+    end
   end
 
   defp add_function(match, message_alias, when_block, do_block) do
