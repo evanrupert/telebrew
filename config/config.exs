@@ -29,3 +29,6 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
+# TESTING
+config :telebrew,
+  api_key: System.get_env("TELEGRAM_API_KEY")

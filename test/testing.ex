@@ -1,16 +1,30 @@
 defmodule Testing do
   use Telebrew
 
+  @init 0
+
   on "/test" do
     send_message m.chat.id, "System is up"
+    
+    state
   end
 
-  on ["photo", "video", "video_note"] do
-    send_message m.chat.id, "Received visual format"
+  on ["/get", "/g"] do
+    send_message m.chat.id, state
+    
+    state
   end
 
-  on ["audio", "voice"] do
-    send_message m.chat.id, "Received audio format"
+  on ["/increase", "/i"] do
+    send_message m.chat.id, "State increased"
+
+    state + 1
+  end
+
+  on ["/decrease", "/d"] do
+    send_message m.chat.id, "State decreased"
+
+    state - 1
   end
   
 end
