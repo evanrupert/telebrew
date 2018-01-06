@@ -38,7 +38,9 @@ defmodule Telebrew.Polling do
   defp polling(listener_pid, last_update_id) do
     # try to poll updates, if :timeout is received try again
     try do
-      last_update = List.last(Telebrew.HTTP.request!("getUpdates", %{}))
+      updates = Telebrew.HTTP.request!("getUpdates", %{offset: last_update_id})
+      last_update = List.last(updates)
+      # Logger.debug "Last update: #{last_update.message.text}" # DEBUG
 
       if not is_nil(last_update) and last_update.update_id != last_update_id do
         GenServer.cast(listener_pid, {:update, last_update.message})

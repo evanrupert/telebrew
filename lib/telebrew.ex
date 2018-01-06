@@ -13,8 +13,8 @@ defmodule Telebrew do
 
       # make events attribute to capture all of the listener functions
       Module.register_attribute(__MODULE__, :events, accumulate: true)
-      # give init attribute a value of nil to avoid the '@init is not defined' warnings
-      Module.put_attribute(__MODULE__, :init, nil)
+      # give init attribute a value of nil to avoid the '@state is not defined' warnings
+      Module.put_attribute(__MODULE__, :state, nil)
       
       @before_compile unquote(__MODULE__)
     end
@@ -27,7 +27,7 @@ defmodule Telebrew do
         IO.puts "Starting Listener"
         IO.puts "=================\n"
 
-        state = @init
+        state = @state
 
         {:ok, listener_pid} = GenServer.start_link(Telebrew.Listener, {__MODULE__, @events, state})
 
@@ -117,7 +117,7 @@ defmodule Telebrew do
       @events unquote(match_atom)
 
       # If init is defined, then define state in the macro therefore warning them if a listener does not use state
-      if @init != nil do
+      if @state != nil do
         def unquote(match_atom)(message, state) do
           var!(m) = message
           var!(state) = state

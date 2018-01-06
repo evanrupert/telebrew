@@ -65,40 +65,40 @@ defmodule Telebrew.Listener do
 
   defp log_message(message) do
     log_message = 
-    cond do
-      Map.has_key?(message, :text) ->
-        message.text
-      Map.has_key?(message, :photo) ->
-        file_id = (List.first(message.photo)).file_id
-        "Photo(#{file_id})"
-      Map.has_key?(message, :sticker) ->
-        emoji = message.sticker.emoji
-        set_name = message.sticker.set_name
-        "Sticker(#{emoji}, #{set_name})"
-      Map.has_key?(message, :audio) ->
-        file_id = message.audio.file_id
-        "Audio(#{file_id})"
-      Map.has_key?(message, :voice) ->
-        file_id = message.voice.file_id
-        "Voice(#{file_id})"
-      Map.has_key?(message, :document) ->
-        file_id = message.document.file_id
-        "Document(#{file_id})"
-      Map.has_key?(message, :video) ->
-        file_id = message.video.file_id
-        "Video(#{file_id})"
-      Map.has_key?(message, :video_note) ->
-        file_id = message.video_note.file_id
-        "Video Note(#{file_id})"
-      Map.has_key?(message, :location) ->
-        lat = message.location.latitude
-        lon = message.location.longitude
-        "Location(#{lat}, #{lon})"
-      true ->
-        # DEBUG
-        IO.inspect message
-        "Unknown"
-    end
+      cond do
+        Map.has_key?(message, :text) ->
+          message.text
+        Map.has_key?(message, :photo) ->
+          file_id = (List.first(message.photo)).file_id
+          "Photo(#{file_id})"
+        Map.has_key?(message, :sticker) ->
+          emoji = message.sticker.emoji
+          set_name = message.sticker.set_name
+          "Sticker(#{emoji}, #{set_name})"
+        Map.has_key?(message, :audio) ->
+          file_id = message.audio.file_id
+          "Audio(#{file_id})"
+        Map.has_key?(message, :voice) ->
+          file_id = message.voice.file_id
+          "Voice(#{file_id})"
+        Map.has_key?(message, :document) ->
+          file_id = message.document.file_id
+          "Document(#{file_id})"
+        Map.has_key?(message, :video) ->
+          file_id = message.video.file_id
+          "Video(#{file_id})"
+        Map.has_key?(message, :video_note) ->
+          file_id = message.video_note.file_id
+          "Video Note(#{file_id})"
+        Map.has_key?(message, :location) ->
+          lat = message.location.latitude
+          lon = message.location.longitude
+          "Location(#{lat}, #{lon})"
+        true ->
+          # DEBUG
+          IO.inspect message
+          "Unknown"
+      end
 
     Logger.info "Received Message: #{log_message}"
   end

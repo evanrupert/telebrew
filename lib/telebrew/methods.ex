@@ -2,7 +2,7 @@ defmodule Telebrew.Methods do
   import Telebrew.HTTP
 
   @docs_address "https://core.telegram.org/bots/api"
-  
+
   @moduledoc """
   This module stores all of the abstractions over the telegram bot api methods
   """
@@ -90,6 +90,7 @@ defmodule Telebrew.Methods do
     forward_message(chat_id, from_chat, message_id, params)
     |> check_error
   end
+
   @doc """
   Sends a photo to the given chat_id
 
@@ -98,7 +99,7 @@ defmodule Telebrew.Methods do
     - `disable_notification`: (Boolean) Sends message without sound or vibration
     - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
     - `reply_markup`: (Map) Additional interface options go [here](#{@docs_address}#sendphoto) for more info
-  
+
   ## Example ##
       # will echo a photo back to the user with the caption "echo"
       on "photo" do
@@ -147,9 +148,16 @@ defmodule Telebrew.Methods do
         audio: audio
       }
       |> add_optional_params(
-        [:caption, :duration, :performer, :title, :disable_notification,
-         :reply_to_message_id, :reply_markup],
-         params
+        [
+          :caption,
+          :duration,
+          :performer,
+          :title,
+          :disable_notification,
+          :reply_to_message_id,
+          :reply_markup
+        ],
+        params
       )
 
     request("sendAudio", json_body)
@@ -173,18 +181,17 @@ defmodule Telebrew.Methods do
   - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#senddocument) for more information
   """
   def send_document(chat_id, document, params \\ []) do
-    json_body = 
+    json_body =
       %{
         chat_id: chat_id,
         document: document
       }
       |> add_optional_params(
-        [:caption, :disable_notification, :reply_to_message_id,
-         :reply_markup],
-         params
+        [:caption, :disable_notification, :reply_to_message_id, :reply_markup],
+        params
       )
 
-      request("sendDocument", json_body)
+    request("sendDocument", json_body)
   end
 
   @doc """
@@ -198,7 +205,7 @@ defmodule Telebrew.Methods do
   @doc """
   Sends video files, supports mp4 videos (other formats will be sent as a Document)
 
-  
+
   ## Optional Parameters ##
   - `duration`: (Integer) Duration of send video in seconds
   - `width`: (Integer) Video width
@@ -215,12 +222,19 @@ defmodule Telebrew.Methods do
         video: video
       }
       |> add_optional_params(
-        [:duration, :width, :height, :caption, :disable_notification,
-         :reply_to_message_id, :reply_markup],
-         params
+        [
+          :duration,
+          :width,
+          :height,
+          :caption,
+          :disable_notification,
+          :reply_to_message_id,
+          :reply_markup
+        ],
+        params
       )
 
-      request("sendVideo", json_body)
+    request("sendVideo", json_body)
   end
 
   @doc """
@@ -251,9 +265,8 @@ defmodule Telebrew.Methods do
         voice: voice
       }
       |> add_optional_params(
-        [:caption, :duration, :disable_notification,
-         :reply_to_message_id, :reply_markup],
-         params
+        [:caption, :duration, :disable_notification, :reply_to_message_id, :reply_markup],
+        params
       )
 
     request("sendVoice", json_body)
@@ -263,7 +276,7 @@ defmodule Telebrew.Methods do
   Same as `send_voice/2` but will raise `Telebrew.Error` on failure
   """
   def send_voice!(chat_id, voice, params \\ []) do
-    send_voice(chat_id, voice, params) 
+    send_voice(chat_id, voice, params)
     |> check_error
   end
 
@@ -284,12 +297,11 @@ defmodule Telebrew.Methods do
         video_note: video_note
       }
       |> add_optional_params(
-        [:duration, :length, :disable_notification,
-         :reply_to_message_id, :reply_markup],
-         params
+        [:duration, :length, :disable_notification, :reply_to_message_id, :reply_markup],
+        params
       )
 
-      request("sendVideoNote", json_body)
+    request("sendVideoNote", json_body)
   end
 
   @doc """
@@ -320,7 +332,7 @@ defmodule Telebrew.Methods do
         params
       )
 
-      request("sendMediaGroup", json_body)
+    request("sendMediaGroup", json_body)
   end
 
   @doc """
@@ -335,7 +347,7 @@ defmodule Telebrew.Methods do
   Sends a location in the form of a latitude and longitude
 
   ## Optional Parameters ##
-  - `live_period`: (Integer) Period in seconds for which the location will be updated
+  - `live_period`: (Integer) Period in seconds for which the location will be updated.  Should be between 60 and 86400.
   - `disable_notification`: (Boolean) Sends message without sound or vibration
   - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
   - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendlocation) for more information
@@ -348,12 +360,11 @@ defmodule Telebrew.Methods do
         longitude: longitude
       }
       |> add_optional_params(
-        [:live_period, :disable_notification, 
-         :reply_to_message_id, :reply_markup],
-         params
+        [:live_period, :disable_notification, :reply_to_message_id, :reply_markup],
+        params
       )
 
-      request("sendLocation", json_body)
+    request("sendLocation", json_body)
   end
 
   @doc """
@@ -364,9 +375,93 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  @doc """
+  Updates the location of a live location message sent by the bot
+  or via the bot.
+
+  Either chat_id and message_id or only inline_message_id are required to identify the message to update
+
+  ## Parameters ##
+  - `chat_id`: (Integer or String) Id of the chat the location is in
+  - `message_id`: (Integer) Id of the location message to update
+  - `inline_message_id`: (String) Id of the inline message
+  - `reply_markup`: (Map) JSON-serialized object for a new inline keyboard see [here](#{@docs_address}#editmessagelivelocation)
+  """
+  def edit_message_live_location(latitude, longitude, params \\ []) do
+    json_body =
+      cond do
+        Keyword.has_key?(params, :inline_message_id) ->
+          %{
+            inline_message_id: Keyword.get(params, :inline_message_id),
+            latitude: latitude,
+            longitude: longitude
+          } 
+          |> add_optional_params([:reply_markup], params)
+        Keyword.has_key?(params, :chat_id) and Keyword.has_key?(params, :message_id) ->
+          %{
+            chat_id: Keyword.get(params, :chat_id),
+            message_id: Keyword.get(params, :message_id),
+            latitude: latitude,
+            longitude: longitude
+          }
+          |> add_optional_params([:reply_markup], params)
+        true ->
+          raise Telebrew.SyntaxError, message: "edit_message_live_location params must contain either chat_id and message_id or only inline_message_id"
+      end
+
+    request("editMessageLiveLocation", json_body)
+  end
+
+  @doc """
+  Same as `edit_message_live_location/4` and `edit_message_live_location/3`
+  but will raise `Telebrew.Error` on failure
+  """
+  def edit_message_live_location!(latitude, longitude, params \\ []) do
+    edit_message_live_location(latitude, longitude, params)
+    |> check_error
+  end
+
+  @doc """
+  Stops the live location of a location message
+
+  Either chat_id and message_id or only inline_message_id are required to identify the message to update
+
+  ## Parameters ##
+  - `chat_id`: (Integer or String) Id of the chat the location is in
+  - `message_id`: (Integer) Id of the location message to update
+  - `inline_message_id`: (String) Id of the inline message
+  - `reply_markup`: (Map) JSON-serialized object for a new inline keyboard see [here](#{@docs_address}#stopmessagelivelocation)
+  """
+  def stop_message_live_location(params \\ []) do
+    json_body =
+      cond do
+        Keyword.has_key?(params, :inline_message_id) ->
+          %{
+            inline_message_id: Keyword.get(params, :inline_message_id)
+          }
+          |> add_optional_params([:reply_markup], params)
+        Keyword.has_key?(params, :chat_id) and Keyword.has_key?(params, :message_id) ->
+          %{
+            chat_id: Keyword.get(params, :chat_id),
+            message_id: Keyword.get(params, :message_id)
+          }
+          |> add_optional_params([:reply_markup], params)
+        true ->
+          raise Telebrew.SyntaxError, message: "stop_message_live_location params must contain either chat_id and message_id or only inline_message_id"
+      end
+
+    request("stopMessageLiveLocation", json_body)
+  end
+
+  @doc """
+  Same as `stop_message_live_location/0` but will raise `Telebrew.Error` on failure
+  """
+  def stop_message_live_location!(params \\ []) do
+    stop_message_live_location(params)
+    |> check_error
+  end
 
   # Helper Functions
-
 
   defp check_error({:ok, resp}), do: resp
 
