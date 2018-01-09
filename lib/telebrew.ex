@@ -1,10 +1,19 @@
 defmodule Telebrew do
-@moduledoc """
+  @moduledoc """
   Contains all macros for defining message event listeners
   """
-  @reserved_events [:text, :default, :photo, :sticker, :audio, 
-                    :document, :video, :video_note, :voice,
-                    :location]
+  @reserved_events [
+    :text,
+    :default,
+    :photo,
+    :sticker,
+    :audio,
+    :document,
+    :video,
+    :video_note,
+    :voice,
+    :location
+  ]
 
   defmacro __using__(_opts) do
     quote do
@@ -15,7 +24,7 @@ defmodule Telebrew do
       Module.register_attribute(__MODULE__, :events, accumulate: true)
       # give init attribute a value of nil to avoid the '@state is not defined' warnings
       Module.put_attribute(__MODULE__, :state, nil)
-      
+
       @before_compile unquote(__MODULE__)
     end
   end
@@ -23,13 +32,14 @@ defmodule Telebrew do
   defmacro __before_compile__(_env) do
     quote do
       def start do
-        IO.puts "\n================="
-        IO.puts "Starting Listener"
-        IO.puts "=================\n"
+        IO.puts("\n=================")
+        IO.puts("Starting Listener")
+        IO.puts("=================\n")
 
         state = @state
 
-        {:ok, listener_pid} = GenServer.start_link(Telebrew.Listener, {__MODULE__, @events, state})
+        {:ok, listener_pid} =
+          GenServer.start_link(Telebrew.Listener, {__MODULE__, @events, state})
 
         Task.start(Telebrew.Polling, :run, [listener_pid])
       end
@@ -121,7 +131,7 @@ defmodule Telebrew do
         def unquote(match_atom)(message, state) do
           var!(m) = message
           var!(state) = state
-  
+
           if unquote(when_block) do
             unquote(do_block)
           else
@@ -129,7 +139,7 @@ defmodule Telebrew do
           end
         end
 
-      # if init is not defined, than do not define state preventing a bunch of warnings about state not being defined
+        # if init is not defined, than do not define state preventing a bunch of warnings about state not being defined
       else
         def unquote(match_atom)(message, _state) do
           var!(m) = message

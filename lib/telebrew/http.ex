@@ -12,7 +12,6 @@ defmodule Telebrew.HTTP do
   Returns either `{ :ok, result }` or `{ :error, reason }`
   """
   def request(method, body) do
-
     # get api key
     api_key = Application.get_env(:telebrew, :api_key)
 
@@ -67,8 +66,10 @@ defmodule Telebrew.HTTP do
       case val do
         list when is_list(list) ->
           {String.to_atom(key), strings_to_atoms(list)}
+
         map when is_map(map) ->
           {String.to_atom(key), strings_to_atoms(map)}
+
         x ->
           {String.to_atom(key), x}
       end

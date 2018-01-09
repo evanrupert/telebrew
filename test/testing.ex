@@ -4,7 +4,7 @@ defmodule Testing do
   @state %{}
 
   on "/test" do
-    send_message m.chat.id, "System is up" 
+    send_message(m.chat.id, "System is up")
 
     state
   end
@@ -12,7 +12,7 @@ defmodule Testing do
   on "/random" do
     {lat, lon} = random_coordinets()
 
-    msg = send_location! m.chat.id, lat, lon, live_period: 60
+    msg = send_location!(m.chat.id, lat, lon, live_period: 60)
 
     Map.put(state, :loc_message_id, msg.message_id)
   end
@@ -21,9 +21,9 @@ defmodule Testing do
     {lat, lon} = random_coordinets()
 
     if Map.has_key?(state, :loc_message_id) do
-      edit_message_live_location lat, lon, chat_id: m.chat.id, message_id: state.loc_message_id
+      edit_message_live_location(lat, lon, chat_id: m.chat.id, message_id: state.loc_message_id)
     else
-      send_message m.chat.id, "Random location has not been started use '/random'"      
+      send_message(m.chat.id, "Random location has not been started use '/random'")
     end
 
     state
@@ -31,11 +31,11 @@ defmodule Testing do
 
   on "/get" do
     if Map.has_key?(state, :loc_message_id) do
-      send_message m.chat.id, state.loc_message_id
+      send_message(m.chat.id, state.loc_message_id)
     else
-      send_message m.chat.id, "Random location has not been started use '/random'"  
+      send_message(m.chat.id, "Random location has not been started use '/random'")
     end
-    
+
     state
   end
 
@@ -45,16 +45,15 @@ defmodule Testing do
 
       Map.delete(state, :loc_message_id)
     else
-      send_message m.chat.id, "Random location has not been started use '/random'"
-      
+      send_message(m.chat.id, "Random location has not been started use '/random'")
+
       state
     end
   end
 
   def random_coordinets do
-    lat = (:rand.uniform() * 180) - 90
-    lon = (:rand.uniform() * 360) - 180
-    {lat, lon} 
+    lat = :rand.uniform() * 180 - 90
+    lon = :rand.uniform() * 360 - 180
+    {lat, lon}
   end
-
 end

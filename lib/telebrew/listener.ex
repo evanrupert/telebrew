@@ -3,9 +3,18 @@ defmodule Telebrew.Listener do
 
   require Logger
 
-  @reserved_events [:text, :default, :photo, :sticker, :audio, 
-                    :document, :video, :video_note, :voice,
-                    :location]
+  @reserved_events [
+    :text,
+    :default,
+    :photo,
+    :sticker,
+    :audio,
+    :document,
+    :video,
+    :video_note,
+    :voice,
+    :location
+  ]
 
   def init(args) do
     {:ok, args}
@@ -14,13 +23,14 @@ defmodule Telebrew.Listener do
   def handle_cast({:update, message}, {module, events, state}) do
     log_message(message)
 
-    new_state = cond do
-      Map.has_key?(message, :text) and String.starts_with?(message.text, "/") ->
-        handle_command(module, events, message, state)
-      
-      true ->
-        handle_event(module, message, state)
-    end
+    new_state =
+      cond do
+        Map.has_key?(message, :text) and String.starts_with?(message.text, "/") ->
+          handle_command(module, events, message, state)
+
+        true ->
+          handle_event(module, message, state)
+      end
 
     {:noreply, {module, events, new_state}}
   end
@@ -53,7 +63,7 @@ defmodule Telebrew.Listener do
   defp handle_event(module, message, state) do
     # reduce over all event types to find the matching listener
     @reserved_events
-    |> Enum.reduce(state, fn (event, state) -> 
+    |> Enum.reduce(state, fn event, state ->
       # if the message is one of the events and a listener has been defined call it and replace the old state value
       if Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
         apply(module, event, [message, state])
@@ -64,43 +74,52 @@ defmodule Telebrew.Listener do
   end
 
   defp log_message(message) do
-    log_message = 
+    log_message =
       cond do
         Map.has_key?(message, :text) ->
           message.text
+
         Map.has_key?(message, :photo) ->
-          file_id = (List.first(message.photo)).file_id
+          file_id = List.first(message.photo).file_id
           "Photo(#{file_id})"
+
         Map.has_key?(message, :sticker) ->
           emoji = message.sticker.emoji
           set_name = message.sticker.set_name
           "Sticker(#{emoji}, #{set_name})"
+
         Map.has_key?(message, :audio) ->
           file_id = message.audio.file_id
           "Audio(#{file_id})"
+
         Map.has_key?(message, :voice) ->
           file_id = message.voice.file_id
           "Voice(#{file_id})"
+
         Map.has_key?(message, :document) ->
           file_id = message.document.file_id
           "Document(#{file_id})"
+
         Map.has_key?(message, :video) ->
           file_id = message.video.file_id
           "Video(#{file_id})"
+
         Map.has_key?(message, :video_note) ->
           file_id = message.video_note.file_id
           "Video Note(#{file_id})"
+
         Map.has_key?(message, :location) ->
           lat = message.location.latitude
           lon = message.location.longitude
           "Location(#{lat}, #{lon})"
+
         true ->
           # DEBUG
-          IO.inspect message
+          IO.inspect(message)
           "Unknown"
       end
 
-    Logger.info "Received Message: #{log_message}"
+    Logger.info("Received Message: #{log_message}")
   end
 
   defp split_message(message) do

@@ -385,7 +385,9 @@ defmodule Telebrew.Methods do
   - `chat_id`: (Integer or String) Id of the chat the location is in
   - `message_id`: (Integer) Id of the location message to update
   - `inline_message_id`: (String) Id of the inline message
-  - `reply_markup`: (Map) JSON-serialized object for a new inline keyboard see [here](#{@docs_address}#editmessagelivelocation)
+  - `reply_markup`: (Map) JSON-serialized object for a new inline keyboard see [here](#{
+    @docs_address
+  }#editmessagelivelocation)
   """
   def edit_message_live_location(latitude, longitude, params \\ []) do
     json_body =
@@ -395,8 +397,9 @@ defmodule Telebrew.Methods do
             inline_message_id: Keyword.get(params, :inline_message_id),
             latitude: latitude,
             longitude: longitude
-          } 
+          }
           |> add_optional_params([:reply_markup], params)
+
         Keyword.has_key?(params, :chat_id) and Keyword.has_key?(params, :message_id) ->
           %{
             chat_id: Keyword.get(params, :chat_id),
@@ -405,8 +408,11 @@ defmodule Telebrew.Methods do
             longitude: longitude
           }
           |> add_optional_params([:reply_markup], params)
+
         true ->
-          raise Telebrew.SyntaxError, message: "edit_message_live_location params must contain either chat_id and message_id or only inline_message_id"
+          raise Telebrew.SyntaxError,
+            message:
+              "edit_message_live_location params must contain either chat_id and message_id or only inline_message_id"
       end
 
     request("editMessageLiveLocation", json_body)
@@ -430,7 +436,9 @@ defmodule Telebrew.Methods do
   - `chat_id`: (Integer or String) Id of the chat the location is in
   - `message_id`: (Integer) Id of the location message to update
   - `inline_message_id`: (String) Id of the inline message
-  - `reply_markup`: (Map) JSON-serialized object for a new inline keyboard see [here](#{@docs_address}#stopmessagelivelocation)
+  - `reply_markup`: (Map) JSON-serialized object for a new inline keyboard see [here](#{
+    @docs_address
+  }#stopmessagelivelocation)
   """
   def stop_message_live_location(params \\ []) do
     json_body =
@@ -440,14 +448,18 @@ defmodule Telebrew.Methods do
             inline_message_id: Keyword.get(params, :inline_message_id)
           }
           |> add_optional_params([:reply_markup], params)
+
         Keyword.has_key?(params, :chat_id) and Keyword.has_key?(params, :message_id) ->
           %{
             chat_id: Keyword.get(params, :chat_id),
             message_id: Keyword.get(params, :message_id)
           }
           |> add_optional_params([:reply_markup], params)
+
         true ->
-          raise Telebrew.SyntaxError, message: "stop_message_live_location params must contain either chat_id and message_id or only inline_message_id"
+          raise Telebrew.SyntaxError,
+            message:
+              "stop_message_live_location params must contain either chat_id and message_id or only inline_message_id"
       end
 
     request("stopMessageLiveLocation", json_body)

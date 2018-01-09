@@ -9,10 +9,9 @@ defmodule Telebrew.Polling do
 
   @timeout_interval 200
 
-
   def run(listener_pid) do
     last_update_id = get_last_update_id()
-    IO.puts "Task run with pid: #{inspect listener_pid}"
+    IO.puts("Task run with pid: #{inspect(listener_pid)}")
 
     polling(listener_pid, last_update_id)
   end
@@ -21,7 +20,7 @@ defmodule Telebrew.Polling do
     # try to get last update, if :timeout is received try again
     try do
       last_update = List.last(Telebrew.HTTP.request!("getUpdates", %{}))
-    
+
       if last_update do
         last_update.update_id
       else
@@ -29,9 +28,9 @@ defmodule Telebrew.Polling do
       end
     rescue
       e in Telebrew.Error ->
-        Logger.error "Error: #{e.message}, trying again"
+        Logger.error("Error: #{e.message}, trying again")
         :timer.sleep(@timeout_interval)
-        get_last_update_id()       
+        get_last_update_id()
     end
   end
 
@@ -52,7 +51,7 @@ defmodule Telebrew.Polling do
       end
     rescue
       e in Telebrew.Error ->
-        Logger.error "Error: #{e.message}, trying again"
+        Logger.error("Error: #{e.message}, trying again")
         :timer.sleep(@timeout_interval)
         polling(listener_pid, last_update_id)
     end
