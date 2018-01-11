@@ -22,8 +22,8 @@ defmodule Telebrew do
 
       # make events attribute to capture all of the listener functions
       Module.register_attribute(__MODULE__, :events, accumulate: true)
-      # give init attribute a value of nil to avoid the '@state is not defined' warnings
-      Module.put_attribute(__MODULE__, :state, nil)
+      # give init attribute to avoid the '@state is not defined' warnings
+      Module.put_attribute(__MODULE__, :state, :somethingthatwillneverhappen) # value is super random to avoid conflicts
 
       @before_compile unquote(__MODULE__)
     end
@@ -32,16 +32,14 @@ defmodule Telebrew do
   defmacro __before_compile__(_env) do
     quote do
       def start do
-        IO.puts("\n=================")
-        IO.puts("Starting Listener")
-        IO.puts("=================\n")
+        # Start Listener to listen for updates from polling
+        # Start Stash to save state in case of Listener failure 
+        {:ok, _pid} = Supervisor.start_link([
+          {Telebrew.Stash, {__MODULE__, @events, @state}},
+          Telebrew.Listener
+        ], strategy: :one_for_one)
 
-        state = @state
-
-        {:ok, listener_pid} =
-          GenServer.start_link(Telebrew.Listener, {__MODULE__, @events, state})
-
-        Task.start(Telebrew.Polling, :run, [listener_pid])
+        Task.start(Telebrew.Polling, :run, [])
       end
     end
   end
@@ -127,10 +125,12 @@ defmodule Telebrew do
       @events unquote(match_atom)
 
       # If init is defined, then define state in the macro therefore warning them if a listener does not use state
-      if @state != nil do
+      if @state != :somethingthatwillneverhappen do
         def unquote(match_atom)(message, state) do
           var!(m) = message
           var!(state) = state
+
+          _ = var!(m) # Used to get rid of m not used warnings
 
           if unquote(when_block) do
             unquote(do_block)
@@ -143,6 +143,8 @@ defmodule Telebrew do
       else
         def unquote(match_atom)(message, _state) do
           var!(m) = message
+
+          _ = var!(m) # Used to get rid of m not used warnings
 
           if unquote(when_block) do
             unquote(do_block)

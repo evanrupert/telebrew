@@ -1,5 +1,5 @@
 defmodule Telebrew.Listener do
-  use GenServer
+  use GenServer, restart: :transient
 
   require Logger
 
@@ -16,10 +16,32 @@ defmodule Telebrew.Listener do
     :location
   ]
 
-  def init(args) do
+  # Client
+
+  def start_link(_args) do
+    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+  end
+
+  def update(message) do
+    GenServer.cast(__MODULE__, {:update, message})
+  end
+
+  # Server callbacks
+
+  @impl true
+  def init(_args) do
+    # Get initial state from stash server that holds state in case of failure
+    args = GenServer.call(Telebrew.Stash, :get)
     {:ok, args}
   end
 
+  @impl true
+  def terminate(_reason, state) do
+    # Send current state to stash server to save it through restarts
+    GenServer.cast(Telebrew.Stash, {:save, state})
+  end
+
+  @impl true
   def handle_cast({:update, message}, {module, events, state}) do
     log_message(message)
 
