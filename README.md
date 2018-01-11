@@ -27,7 +27,7 @@ config :telebrew,
 
 #### Other optional configuration settings
 - `polling_interval`: (Integer) Amount of time in milliseconds between polling for updates, defaults to 1000
-- `timeout_interval`: (Integer) Amount of time in milliseconds to wait after network timeout before trying again
+- `timeout_interval`: (Integer) Amount of time in milliseconds to wait after network timeout before trying again, defaults to 200
 
 ## Usage
 In order to use telebrew you must use it in a module like this:
@@ -59,8 +59,7 @@ end
 ### Shared state
 
 State can be shared between listeners by defining the @state attribute in your module
-then accessing the state variable in your listeners.  Whatever is returned from the listeners when called
-will become the new state.  **Whatever is returned from the listener will become the new state**
+then accessing the state variable in your listeners.  **Whatever is returned from the listener will become the new state**
 
 ```elixir
 defmodule YourModule do
@@ -100,6 +99,10 @@ Valid: `"/hello"`, `"/test"`, `"/no_spaces"`
 Invalid: `"/has spaces"`, `"no_slash"`
 
 Events are strings not prefixed with "/" and represent predefined types of messages that can be received.  For example:
+
+Valid: `"photo"`, `"document"`, `"video_note"`
+
+Invalid: `"has spaces"`, `"not_defined"`, `"/command"`
 
 ```elixir
 # called anytime a message is received with a photo
