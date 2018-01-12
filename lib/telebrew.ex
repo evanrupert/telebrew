@@ -2,9 +2,10 @@ defmodule Telebrew do
   @moduledoc """
   Contains all macros for defining message event listeners
   """
+
+  # all events in the order that they will be checked in
   @reserved_events [
     :text,
-    :default,
     :photo,
     :sticker,
     :audio,
@@ -12,7 +13,9 @@ defmodule Telebrew do
     :video,
     :video_note,
     :voice,
-    :location
+    :venue,
+    :location,
+    :default
   ]
 
   defmacro __using__(_opts) do

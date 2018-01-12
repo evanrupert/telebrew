@@ -3,9 +3,9 @@ defmodule Telebrew.Listener do
 
   require Logger
 
+  # all events in order that they will be checked for
   @reserved_events [
     :text,
-    :default,
     :photo,
     :sticker,
     :audio,
@@ -13,7 +13,9 @@ defmodule Telebrew.Listener do
     :video,
     :video_note,
     :voice,
-    :location
+    :venue,
+    :location,
+    :default
   ]
 
   # Client
@@ -88,7 +90,7 @@ defmodule Telebrew.Listener do
       @reserved_events
       |> Enum.reduce({false, state}, fn event, {matched, state} ->
         # if the message is one of the events and a listener has been defined call it and replace the old state value
-        if Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
+        if not matched and Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
           {true, apply(module, event, [message, state])}
         else
           {matched, state}

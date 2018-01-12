@@ -817,10 +817,47 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `stop_message_live_location/0` but will raise `Telebrew.Error` on failure
   """
-  @spec stop_message_live_location!(keyword) :: message
+  @spec stop_message_live_location!(keyword) :: message  
   def stop_message_live_location!(params \\ []) do
     stop_message_live_location(params)
     |> check_error
+  end
+
+  @doc """
+  Sends information about a venue
+
+  ## Optional Parameters ##
+  - `foursquare_id`: (String) Foursquare identifier of the venue
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendlocation) for more information
+  """
+  @spec send_venue(chat_id, float, float, binary, binary, keyword) :: result(message)
+  def send_venue(chat_id, latitude, longitude, title, address, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        latitude: latitude,
+        longitude: longitude,
+        title: title,
+        address: address
+      }
+      |> add_optional_params(
+        [:foursquare_id, :disable_notification,
+         :reply_to_message_id, :reply_markup],
+         params
+      )
+
+    request("sendVenue", json_body)
+  end
+
+  @doc """
+  Same as `send_venue/5` but will raise `Telebrew.Error` on failure
+  """
+  @spec send_venue!(chat_id, float, float, binary, binary, keyword) :: message
+  def send_venue!(chat_id, latitude, longitude, title, address, params \\ []) do
+    send_venue(chat_id, latitude, longitude, title, address, params)
+    |> check_error    
   end
 
   # Helper Functions
