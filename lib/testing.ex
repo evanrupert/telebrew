@@ -5,12 +5,7 @@ defmodule Testing do
     send_message(m.chat.id, "System is up")
   end
 
-  on "photo" do
-    send_message m.chat.id, "You received a photo"
-  end
-
   on "default" do
-    send_message m.chat.id, "Something else happened"
+    IO.inspect(m)
   end
-  
 end

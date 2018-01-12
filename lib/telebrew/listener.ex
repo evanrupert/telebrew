@@ -114,9 +114,8 @@ defmodule Telebrew.Listener do
           "Photo(#{file_id})"
 
         Map.has_key?(message, :sticker) ->
-          emoji = message.sticker.emoji
-          set_name = message.sticker.set_name
-          "Sticker(#{emoji}, #{set_name})"
+          file_id = message.sticker.file_id
+          "Sticker(file_id)"
 
         Map.has_key?(message, :audio) ->
           file_id = message.audio.file_id
