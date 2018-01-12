@@ -84,15 +84,23 @@ defmodule Telebrew.Listener do
 
   defp handle_event(module, message, state) do
     # reduce over all event types to find the matching listener
-    @reserved_events
-    |> Enum.reduce(state, fn event, state ->
-      # if the message is one of the events and a listener has been defined call it and replace the old state value
-      if Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
-        apply(module, event, [message, state])
-      else
-        state
-      end
-    end)
+    {matched, new_state} =
+      @reserved_events
+      |> Enum.reduce({false, state}, fn event, {matched, state} ->
+        # if the message is one of the events and a listener has been defined call it and replace the old state value
+        if Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
+          {true, apply(module, event, [message, state])}
+        else
+          {matched, state}
+        end
+      end)
+
+    # if one of the reserved events was not matched and :default listener is defined call default listener
+    if not matched and Keyword.has_key?(module.__info__(:functions), :default) do
+      apply(module, :default, [message, state])
+    else
+      new_state
+    end
   end
 
   defp log_message(message) do

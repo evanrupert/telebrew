@@ -47,7 +47,8 @@ defmodule Telebrew.Polling do
       # Logger.debug "Last update: #{last_update.message.text}" # DEBUG
 
       if not is_nil(last_update) and last_update.update_id != last_update_id do
-        Telebrew.Listener.update(last_update.message) # TESTING
+        # TESTING
+        Telebrew.Listener.update(last_update.message)
         :timer.sleep(@interval)
         polling(last_update.update_id)
       else

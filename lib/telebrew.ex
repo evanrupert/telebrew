@@ -23,7 +23,8 @@ defmodule Telebrew do
       # make events attribute to capture all of the listener functions
       Module.register_attribute(__MODULE__, :events, accumulate: true)
       # give init attribute to avoid the '@state is not defined' warnings
-      Module.put_attribute(__MODULE__, :state, :somethingthatwillneverhappen) # value is super random to avoid conflicts
+      # value is super random to avoid conflicts
+      Module.put_attribute(__MODULE__, :state, :somethingthatwillneverhappen)
 
       @before_compile unquote(__MODULE__)
     end
@@ -34,10 +35,14 @@ defmodule Telebrew do
       def start do
         # Start Listener to listen for updates from polling
         # Start Stash to save state in case of Listener failure 
-        {:ok, _pid} = Supervisor.start_link([
-          {Telebrew.Stash, {__MODULE__, @events, @state}},
-          Telebrew.Listener
-        ], strategy: :one_for_one)
+        {:ok, _pid} =
+          Supervisor.start_link(
+            [
+              {Telebrew.Stash, {__MODULE__, @events, @state}},
+              Telebrew.Listener
+            ],
+            strategy: :one_for_one
+          )
 
         Task.start(Telebrew.Polling, :run, [])
       end
@@ -53,7 +58,7 @@ defmodule Telebrew do
   ## Events ##
 
   - `text`: Will match on any text without a command
-  - `default`: Will match any command that is not previously defined
+  - `default`: Will match any message that is not defined otherwise
   - `photo`: Will match any photo
   - `sticker`: Will match any sticker
   - `audio`: Will match any audio file
@@ -130,7 +135,8 @@ defmodule Telebrew do
           var!(m) = message
           var!(state) = state
 
-          _ = var!(m) # Used to get rid of m not used warnings
+          # Used to get rid of m not used warnings
+          _ = var!(m)
 
           if unquote(when_block) do
             unquote(do_block)
@@ -144,7 +150,8 @@ defmodule Telebrew do
         def unquote(match_atom)(message, _state) do
           var!(m) = message
 
-          _ = var!(m) # Used to get rid of m not used warnings
+          # Used to get rid of m not used warnings
+          _ = var!(m)
 
           if unquote(when_block) do
             unquote(do_block)
