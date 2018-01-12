@@ -69,6 +69,7 @@ defmodule Telebrew do
   - `video`: Will match any video file
   - `video_note`: Will match a video note
   - `document`: Will match any other type of file
+  - `venue`: Will match a sent venue
   - `location`: Will match any location message
 
   ## Examples ##
