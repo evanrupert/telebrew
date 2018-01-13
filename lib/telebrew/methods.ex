@@ -830,7 +830,7 @@ defmodule Telebrew.Methods do
   - `foursquare_id`: (String) Foursquare identifier of the venue
   - `disable_notification`: (Boolean) Sends message without sound or vibration
   - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
-  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendlocation) for more information
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendvenue) for more information
   """
   @spec send_venue(chat_id, float, float, binary, binary, keyword) :: result(message)
   def send_venue(chat_id, latitude, longitude, title, address, params \\ []) do
@@ -858,6 +858,76 @@ defmodule Telebrew.Methods do
   def send_venue!(chat_id, latitude, longitude, title, address, params \\ []) do
     send_venue(chat_id, latitude, longitude, title, address, params)
     |> check_error    
+  end
+
+  @doc """
+  Sends phone contact information
+
+  ## Optional Parameters ##
+  - `last_name`: (String) Contact's last name
+  - `disable_notification`: (Boolean) Sends message without sound or vibration
+  - `reply_to_message_id`: (Integer) If message is a reply, ID of he original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendcontact) for more information
+  """
+  @spec send_contact(chat_id, binary, binary, keyword) :: result(message)
+  def send_contact(chat_id, phone_number, first_name, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        phone_number: phone_number,
+        first_name: first_name
+      }
+      |> add_optional_params(
+        [:last_name, :disable_notification,
+         :reply_to_message_id, :reply_markup],
+         params
+      )
+
+      request("sendContact", json_body)
+  end
+
+  @doc """
+  Same as `send_contact/3` but will raise `Telebrew.Error` on failure
+  """
+  @spec send_contact!(chat_id, binary, binary, keyword) :: message
+  def send_contact!(chat_id, phone_number, first_name, params \\ []) do
+    send_contact(chat_id, phone_number, first_name, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to tell the user something is happening on the bot's side.  The status will appear for 5 seconds or less
+
+  ## Actions ##
+  - `typing`
+  - `upload_photo`
+  - `record_video`
+  - `upload_video`
+  - `record_audio`
+  - `upload_audio`
+  - `upload_document`
+  - `find_location`
+  - `record_video_note`
+  - `upload_video_note`
+  """
+  @spec send_chat_action(chat_id, binary) :: result(boolean)
+  def send_chat_action(chat_id, action) do
+    json_body = 
+      %{
+        chat_id: chat_id,
+        action: action
+      }
+
+    request("sendChatAction", json_body)
+  end
+
+  @doc """
+  Same as `send_chat_action/2` but will throw `Telebrew.Error` on failure
+  """
+  @spec send_chat_action!(chat_id, binary) :: boolean
+  def send_chat_action!(chat_id, action) do
+    send_chat_action(chat_id, action)
+    |> check_error
   end
 
   # Helper Functions

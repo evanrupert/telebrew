@@ -6,12 +6,10 @@ defmodule Telebrew.HTTP do
   @url_base "https://api.telegram.org/bot"
 
   @doc """
-  Basic function to send a post request to the telegram bot api where the method is a string of the method name and
-  the body is a map of all of the parameters
-
-  Returns either `{ :ok, result }` or `{ :error, reason }`
+  Sends a post request but dosn't check for errors, or encode the result into elixir
   """
-  def request(method, body) do
+  @spec raw_request(binary, any) :: any
+  def raw_request(method, body) do
     # get api key
     api_key = Application.get_env(:telebrew, :api_key)
 
@@ -25,7 +23,19 @@ defmodule Telebrew.HTTP do
     headers = [{"Content-type", "application/json"}]
 
     # post method and get response
-    response = HTTPoison.post("#{@url_base}#{api_key}/#{method}", json_body, headers)
+    HTTPoison.post("#{@url_base}#{api_key}/#{method}", json_body, headers)
+  end
+
+  @doc """
+  Basic function to send a post request to the telegram bot api where the method is a string of the method name and
+  the body is a map of all of the parameters
+
+  Returns either `{ :ok, result }` or `{ :error, reason }`
+  """
+  @spec request(binary, any) :: {:ok, any} | {:error, %{error_code: any, description: binary}}
+  def request(method, body) do
+
+    response = raw_request(method, body)
 
     # check for errors
     case response do
@@ -46,6 +56,7 @@ defmodule Telebrew.HTTP do
   @doc """
   Same as `request/2` but will throw `Telebrew.Error` on failure
   """
+  @spec request!(binary, any) :: any
   def request!(method, body) do
     case request(method, body) do
       {:ok, result} ->
@@ -58,6 +69,8 @@ defmodule Telebrew.HTTP do
         raise Telebrew.Error, message: des, error_code: code
     end
   end
+
+  defp strings_to_atoms(atom) when is_atom(atom), do: atom
 
   defp strings_to_atoms(list) when is_list(list), do: for(i <- list, do: strings_to_atoms(i))
 

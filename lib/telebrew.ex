@@ -15,6 +15,7 @@ defmodule Telebrew do
     :voice,
     :venue,
     :location,
+    :contact,
     :default
   ]
 
@@ -74,6 +75,7 @@ defmodule Telebrew do
   - `video_note`: Will match a video note
   - `document`: Will match any other type of file
   - `venue`: Will match a sent venue
+  - `contact`: Will match on a phone contact
   - `location`: Will match any location message
 
   ## Examples ##

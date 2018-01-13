@@ -15,6 +15,7 @@ defmodule Telebrew.Listener do
     :voice,
     :venue,
     :location,
+    :contact,
     :default
   ]
 
@@ -143,6 +144,10 @@ defmodule Telebrew.Listener do
         Map.has_key?(message, :venue) ->
           title = message.venue.title
           "Venue(#{title})"
+
+        Map.has_key?(message, :contact) ->
+          name = message.contact.first_name
+          "Contact(#{name})"
 
         Map.has_key?(message, :location) ->
           lat = message.location.latitude
