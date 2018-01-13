@@ -90,7 +90,7 @@ defmodule Telebrew.Listener do
       @reserved_events
       |> Enum.reduce({false, state}, fn event, {matched, state} ->
         # if the message is one of the events and a listener has been defined call it and replace the old state value
-        if not matched and Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
+        if (not matched) and Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event) do
           {true, apply(module, event, [message, state])}
         else
           {matched, state}
@@ -98,11 +98,12 @@ defmodule Telebrew.Listener do
       end)
 
     # if one of the reserved events was not matched and :default listener is defined call default listener
-    if not matched and Keyword.has_key?(module.__info__(:functions), :default) do
+    if (not matched) and Keyword.has_key?(module.__info__(:functions), :default) do
       apply(module, :default, [message, state])
     else
       new_state
     end
+    new_state
   end
 
   defp log_message(message) do
@@ -138,6 +139,10 @@ defmodule Telebrew.Listener do
         Map.has_key?(message, :video_note) ->
           file_id = message.video_note.file_id
           "Video Note(#{file_id})"
+
+        Map.has_key?(message, :venue) ->
+          title = message.venue.title
+          "Venue(#{title})"
 
         Map.has_key?(message, :location) ->
           lat = message.location.latitude

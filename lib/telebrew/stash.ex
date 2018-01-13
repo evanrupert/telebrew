@@ -8,8 +8,6 @@ defmodule Telebrew.Stash do
   end
 
   def save_state(state) do
-    IO.puts("STATE CHANGED TO")
-    IO.inspect(state)
     GenServer.cast(__MODULE__, {:save, state})
   end
 

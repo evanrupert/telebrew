@@ -1,5 +1,5 @@
 defmodule Telebrew.Polling do
-  use Task, restart: :permanent
+  use Task, restart: :transient
 
   require Logger
 
@@ -10,6 +10,10 @@ defmodule Telebrew.Polling do
   @timeout_interval unless Application.get_env(:telebrew, :timeout_interval),
                       do: 200,
                       else: Application.get_env(:telebrew, :timeout_interval)
+
+  def start_link(_args) do
+    Task.start_link(__MODULE__, :run, [])
+  end
 
   def run do
     last_update_id = get_last_update_id()

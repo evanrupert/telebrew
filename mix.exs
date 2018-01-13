@@ -5,13 +5,15 @@ defmodule Telebrew.Mixfile do
   Simple wrapper for the telegram bot api.
   """
 
-  def project do
+  def project do 
     [
       app: :telebrew,
       version: "0.1.0",
       elixir: "~> 1.5",
       description: @description,
       start_permanent: Mix.env() == :prod,
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
       deps: deps(),
       package: package()
     ]
@@ -28,7 +30,8 @@ defmodule Telebrew.Mixfile do
       {:httpoison, "~> 0.13.0"},
       {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.18.1", only: :dev},
-      {:earmark, "~> 1.2", only: :dev}
+      {:earmark, "~> 1.2", only: :dev},
+      {:excoveralls, "~> 0.8.0", only: :test}
     ]
   end
 

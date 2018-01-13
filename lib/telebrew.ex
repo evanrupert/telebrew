@@ -42,12 +42,16 @@ defmodule Telebrew do
           Supervisor.start_link(
             [
               {Telebrew.Stash, {__MODULE__, @events, @state}},
-              Telebrew.Listener
+              Telebrew.Listener,
+              Telebrew.Polling
             ],
-            strategy: :one_for_one
+            strategy: :one_for_one,
+            name: Telebrew.Supervisor
           )
+      end
 
-        Task.start(Telebrew.Polling, :run, [])
+      def stop do
+        Supervisor.stop(Telebrew.Supervisor)
       end
     end
   end
