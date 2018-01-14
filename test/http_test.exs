@@ -12,7 +12,7 @@ defmodule Telebrew.HTTPTest do
 
   test "request! returns proper info" do
     assert request!("getMe", %{}).is_bot
-  
+
     assert_raise Telebrew.Error, fn ->
       request!("thisisnotamethod", %{})
     end
@@ -37,5 +37,4 @@ defmodule Telebrew.HTTPTest do
 
     Application.put_env(:telebrew, :api_key, System.get_env("TELEGRAM_API_KEY"))
   end
-
 end

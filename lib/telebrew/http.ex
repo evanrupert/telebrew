@@ -5,6 +5,8 @@ defmodule Telebrew.HTTP do
 
   @url_base "https://api.telegram.org/bot"
 
+  @file_base "https://api.telegram.org/file/bot"
+
   @doc """
   Sends a post request but dosn't check for errors, or encode the result into elixir
   """
@@ -26,6 +28,38 @@ defmodule Telebrew.HTTP do
     HTTPoison.post("#{@url_base}#{api_key}/#{method}", json_body, headers)
   end
 
+  def download_file(file_source, destination) do
+    api_key = Application.get_env(:telebrew, :api_key)
+
+    unless api_key do
+      raise Telebrew.SyntaxError, message: "Api key is not configured"
+    end
+
+    resp = HTTPoison.get("#{@file_base}#{api_key}/#{file_source}")
+
+    path = Path.join(destination, Path.basename(file_source))
+
+    case resp do
+      {:ok, %{body: body}} ->
+        case Poison.decode(body) do
+          {:error, _} ->
+            case File.open(path, [:write]) do
+              {:ok, file} ->
+                IO.write(file, body)
+              
+              x ->
+                x
+            end
+
+          {:ok, %{"ok" => false, "reason" => reason}} ->
+            {:error, reason}
+        end
+
+      {:error, reason} ->
+        {:error, reason.message}
+    end
+  end
+
   @doc """
   Basic function to send a post request to the telegram bot api where the method is a string of the method name and
   the body is a map of all of the parameters
@@ -34,7 +68,6 @@ defmodule Telebrew.HTTP do
   """
   @spec request(binary, any) :: {:ok, any} | {:error, %{error_code: any, description: binary}}
   def request(method, body) do
-
     response = raw_request(method, body)
 
     # check for errors

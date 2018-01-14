@@ -7,11 +7,10 @@ defmodule Telebrew.StashTest do
   test "stash works" do
     assert {:ok, _} = Telebrew.Stash.start_link(@state)
 
-    assert @state == Telebrew.Stash.get_state
-    
+    assert @state == Telebrew.Stash.get_state()
+
     Telebrew.Stash.save_state(@new_state)
 
-    assert @new_state == Telebrew.Stash.get_state
+    assert @new_state == Telebrew.Stash.get_state()
   end
-
 end

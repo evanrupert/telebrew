@@ -15,7 +15,6 @@ defmodule TelebrewTest do
       _ = state
       :ok
     end
-
   end
 
   test "single command generates proper function" do
@@ -30,5 +29,4 @@ defmodule TelebrewTest do
     assert TestListener."/something"(nil, nil) == :ok
     assert TestListener."/something_else"(nil, nil) == :ok
   end
-
 end

@@ -270,14 +270,14 @@ defmodule Telebrew.Methods do
           optional(:contact) => contact,
           optional(:location) => location,
           optional(:venue) => venue,
-          optional(:new_chat_members) => list(user),          
-          optional(:left_chat_member) => user,    
+          optional(:new_chat_members) => list(user),
+          optional(:left_chat_member) => user,
           optional(:new_chat_title) => binary,
           optional(:new_chat_photo) => list(photo_size),
-          optional(:delete_chat_photo) => :true,
-          optional(:group_chat_created) => :true,
-          optional(:supergroup_chat_created) => :true,
-          optional(:channel_chat_created) => :true,
+          optional(:delete_chat_photo) => true,
+          optional(:group_chat_created) => true,
+          optional(:supergroup_chat_created) => true,
+          optional(:channel_chat_created) => true,
           optional(:migrate_to_chat_id) => integer,
           optional(:migrate_from_chat_id) => integer,
           optional(:pinned_message) => message,
@@ -329,6 +329,14 @@ defmodule Telebrew.Methods do
   Represents the content of a media message
   """
   @type input_media :: input_media_photo | input_media_video
+
+  @typedoc """
+  Represents a user's profile pictures
+  """
+  @type user_profile_photos :: %{
+          total_count: integer,
+          photos: list(list(photo_size))
+        }
 
   @moduledoc """
   This module stores all of the abstractions over the telegram bot api methods
@@ -817,7 +825,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `stop_message_live_location/0` but will raise `Telebrew.Error` on failure
   """
-  @spec stop_message_live_location!(keyword) :: message  
+  @spec stop_message_live_location!(keyword) :: message
   def stop_message_live_location!(params \\ []) do
     stop_message_live_location(params)
     |> check_error
@@ -843,9 +851,8 @@ defmodule Telebrew.Methods do
         address: address
       }
       |> add_optional_params(
-        [:foursquare_id, :disable_notification,
-         :reply_to_message_id, :reply_markup],
-         params
+        [:foursquare_id, :disable_notification, :reply_to_message_id, :reply_markup],
+        params
       )
 
     request("sendVenue", json_body)
@@ -857,7 +864,7 @@ defmodule Telebrew.Methods do
   @spec send_venue!(chat_id, float, float, binary, binary, keyword) :: message
   def send_venue!(chat_id, latitude, longitude, title, address, params \\ []) do
     send_venue(chat_id, latitude, longitude, title, address, params)
-    |> check_error    
+    |> check_error
   end
 
   @doc """
@@ -878,12 +885,11 @@ defmodule Telebrew.Methods do
         first_name: first_name
       }
       |> add_optional_params(
-        [:last_name, :disable_notification,
-         :reply_to_message_id, :reply_markup],
-         params
+        [:last_name, :disable_notification, :reply_to_message_id, :reply_markup],
+        params
       )
 
-      request("sendContact", json_body)
+    request("sendContact", json_body)
   end
 
   @doc """
@@ -912,11 +918,10 @@ defmodule Telebrew.Methods do
   """
   @spec send_chat_action(chat_id, binary) :: result(boolean)
   def send_chat_action(chat_id, action) do
-    json_body = 
-      %{
-        chat_id: chat_id,
-        action: action
-      }
+    json_body = %{
+      chat_id: chat_id,
+      action: action
+    }
 
     request("sendChatAction", json_body)
   end
@@ -930,12 +935,80 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  @doc """
+  Use to get a list of profile pictures for a user
+
+  ## Optional Parameters ##
+  - `offset` (Integer) Sequential number of the first photo to be returned
+  - `limit` (Integer) Limites the number of photos to be returned, 1-100
+  """
+  @spec get_user_profile_photos(integer, keyword) :: result(user_profile_photos)
+  def get_user_profile_photos(user_id, params \\ []) do
+    json_body = %{
+      user_id: user_id
+    }
+    |> add_optional_params(
+      [:offset, :limit],
+      params
+    )
+
+    request("getUserProfilePhotos", json_body)
+  end
+
+  @doc """
+  Same as `get_user`profile_photos/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec get_user_profile_photos!(integer, keyword) :: user_profile_photos
+  def get_user_profile_photos!(user_id, params \\ []) do
+    get_user_profile_photos(user_id, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to get basic information about a file
+  """
+  @spec get_file(binary) :: result(file)
+  def get_file(file_id), do: request("getFile", %{file_id: file_id})
+
+  @doc """
+  Same as `get_file/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec get_file!(binary) :: file
+  def get_file!(file_id), do: get_file(file_id) |> check_error
+
+  @doc """
+  Will download a file to the given destination
+  """
+  @spec download_file(binary, binary) :: {:error, binary} | {:error, atom} | :ok
+  def download_file(file_id, destination) do
+    case get_file(file_id) do
+      {:ok, file} ->
+        Telebrew.HTTP.download_file(file.file_path, destination)
+      
+      x ->
+        x
+    end
+  end
+
+  @doc """
+  Same as `download_file/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec download_file!(binary, binary) :: :ok
+  def download_file!(file_id, destination) do
+    download_file(file_id, destination)
+    |> check_error
+  end
+
   # Helper Functions
 
   defp check_error({:ok, resp}), do: resp
 
   defp check_error({:error, %{error_code: c, description: d}}) do
     raise Telebrew.Error, message: d, error_code: c
+  end
+
+  defp check_error({:error, reason}) do
+    raise Telebrew.Error, message: reason
   end
 
   defp add_optional_params(map, param_names, params) do

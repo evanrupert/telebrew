@@ -30,5 +30,4 @@ defmodule Telebrew.MethodsTest do
   #     forward_message! :wrong_type, :other_wrong_type, :yet_another_wrong_type
   #   end
   # end
-
 end
