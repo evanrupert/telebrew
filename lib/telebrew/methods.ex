@@ -983,7 +983,7 @@ defmodule Telebrew.Methods do
   def download_file(file_id, destination) do
     case get_file(file_id) do
       {:ok, file} ->
-        Telebrew.HTTP.download_file(file.file_path, destination)
+        http_download_file(file.file_path, destination)
       
       x ->
         x
@@ -995,7 +995,57 @@ defmodule Telebrew.Methods do
   """
   @spec download_file!(binary, binary) :: :ok
   def download_file!(file_id, destination) do
-    download_file(file_id, destination)
+    http_download_file(file_id, destination)
+    |> check_error
+  end
+
+  @doc """
+  Used to kick a user from a group.
+  
+  The bot must have admin privilages and the 'All Members Are Admins' must be disabled
+  
+  ## Optional Parameter ##
+  - `until_date`: (Integer) Date when the user will be unbanned.  If the user is banned for more than 366 days or less than 30 seconds from the current time they are banned forever
+  """
+  @spec kick_chat_member(chat_id, integer, keyword) :: result(:true)
+  def kick_chat_member(chat_id, user_id, params \\ []) do
+    json_body = %{
+      chat_id: chat_id,
+      user_id: user_id
+    }
+    |> add_optional_params([:until_date], params)
+
+    request("kickChatMember", json_body)
+  end
+
+  @doc """
+  Same as `kick_chat_member/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec kick_chat_member!(chat_id, integer, keyword) :: :true
+  def kick_chat_member!(chat_id, user_id, params \\ []) do
+    kick_chat_member(chat_id, user_id, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to unban a previously kicked user in a supergroup or channel.
+  """
+  @spec unban_chat_member(chat_id, integer) :: result(:true)
+  def unban_chat_member(chat_id, user_id) do
+    json_body = %{
+      chat_id: chat_id,
+      user_id: user_id
+    }
+
+    request("unbanChatMember", json_body)
+  end
+
+  @doc """
+  Same as `unban_chat_member/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec unban_chat_member!(chat_id, integer) :: :true
+  def unban_chat_member!(chat_id, user_id) do
+    unban_chat_member(chat_id, user_id)
     |> check_error
   end
 

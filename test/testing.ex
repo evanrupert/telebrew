@@ -5,9 +5,15 @@ defmodule Testing do
     send_message m.chat.id, "System is up"
   end
 
-  on "document" do
-    result = download_file(m.document.file_id, "/home/evan/Documents")
-    send_message m.chat.id, result
+  on "/kick" do
+    {user_id, _} = Integer.parse(m.text)
+    IO.inspect kick_chat_member(m.chat.id, user_id)
+  end
+
+  on "/unban" do
+    {user_id, _} = Integer.parse(m.text)
+    
+    IO.inspect unban_chat_member(m.chat.id, user_id)
   end
 
   on "default" do

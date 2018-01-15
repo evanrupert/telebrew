@@ -28,7 +28,7 @@ defmodule Telebrew.HTTP do
     HTTPoison.post("#{@url_base}#{api_key}/#{method}", json_body, headers)
   end
 
-  def download_file(file_source, destination) do
+  def http_download_file(file_source, destination) do
     api_key = Application.get_env(:telebrew, :api_key)
 
     unless api_key do
