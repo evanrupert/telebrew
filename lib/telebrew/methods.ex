@@ -944,13 +944,14 @@ defmodule Telebrew.Methods do
   """
   @spec get_user_profile_photos(integer, keyword) :: result(user_profile_photos)
   def get_user_profile_photos(user_id, params \\ []) do
-    json_body = %{
-      user_id: user_id
-    }
-    |> add_optional_params(
-      [:offset, :limit],
-      params
-    )
+    json_body =
+      %{
+        user_id: user_id
+      }
+      |> add_optional_params(
+        [:offset, :limit],
+        params
+      )
 
     request("getUserProfilePhotos", json_body)
   end
@@ -984,7 +985,7 @@ defmodule Telebrew.Methods do
     case get_file(file_id) do
       {:ok, file} ->
         http_download_file(file.file_path, destination)
-      
+
       x ->
         x
     end
@@ -1001,19 +1002,20 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to kick a user from a group.
-  
+
   The bot must have admin privilages and the 'All Members Are Admins' must be disabled
-  
+
   ## Optional Parameter ##
   - `until_date`: (Integer) Date when the user will be unbanned.  If the user is banned for more than 366 days or less than 30 seconds from the current time they are banned forever
   """
-  @spec kick_chat_member(chat_id, integer, keyword) :: result(:true)
+  @spec kick_chat_member(chat_id, integer, keyword) :: result(true)
   def kick_chat_member(chat_id, user_id, params \\ []) do
-    json_body = %{
-      chat_id: chat_id,
-      user_id: user_id
-    }
-    |> add_optional_params([:until_date], params)
+    json_body =
+      %{
+        chat_id: chat_id,
+        user_id: user_id
+      }
+      |> add_optional_params([:until_date], params)
 
     request("kickChatMember", json_body)
   end
@@ -1021,7 +1023,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `kick_chat_member/2` but will raise `Telebrew.Error` on failure
   """
-  @spec kick_chat_member!(chat_id, integer, keyword) :: :true
+  @spec kick_chat_member!(chat_id, integer, keyword) :: true
   def kick_chat_member!(chat_id, user_id, params \\ []) do
     kick_chat_member(chat_id, user_id, params)
     |> check_error
@@ -1030,7 +1032,7 @@ defmodule Telebrew.Methods do
   @doc """
   Used to unban a previously kicked user in a supergroup or channel.
   """
-  @spec unban_chat_member(chat_id, integer) :: result(:true)
+  @spec unban_chat_member(chat_id, integer) :: result(true)
   def unban_chat_member(chat_id, user_id) do
     json_body = %{
       chat_id: chat_id,
@@ -1043,9 +1045,124 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `unban_chat_member/2` but will raise `Telebrew.Error` on failure
   """
-  @spec unban_chat_member!(chat_id, integer) :: :true
+  @spec unban_chat_member!(chat_id, integer) :: true
   def unban_chat_member!(chat_id, user_id) do
     unban_chat_member(chat_id, user_id)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to restrict a user in a supergroup.
+
+  The bot must be an administrator and have appropriot admin rights.
+
+  Pass true to all parameters to lift all restrictions.
+
+  ## Optional Parameters ##
+  - `until_date`: (Integer) Date when restrictions will be lifted for the user.  In unix time.
+  - `can_send_messages`: (Boolean) Determines if the user should be able to send messages
+  - `can_send_media_messages`: (Boolean) Determines if the user should be able to send files
+  - `can_send_other_messages`: (Boolean) Determines if the user should be able to send animations, games, stickers, and user inline bots
+  - `can_add_web_page_previews`: (Boolean) Determines if the user should be able to add web page previews to their messages
+  """
+  @spec restrict_chat_member(chat_id, integer, keyword) :: result(:true)
+  def restrict_chat_member(chat_id, user_id, params \\ []) do
+    json_body = 
+      %{
+        chat_id: chat_id,
+        user_id: user_id
+      }
+      |> add_optional_params(
+        [:until_date,
+         :can_send_messages,
+         :can_send_media_messages,
+         :can_send_other_messages,
+         :can_add_web_page_previews],
+         params
+      )
+
+      request("restrictChatMember", json_body)
+  end
+
+  # TODO: Test
+  @doc """
+  Same as `restrict_chat_member/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec restrict_chat_member!(chat_id, integer, keyword) :: :true 
+  def restrict_chat_member!(chat_id, user_id, params \\ []) do
+    restrict_chat_member(chat_id, user_id, params)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to promote or demote a user in a supergroup or channel.
+
+  The bot must be an administrator with appropriate admin rights.
+
+  Pass false for all boolean parameters to demote a user.
+
+  ## Optional Parameters ##
+  - `can_change_info`: (Boolean) Determines if admin can change chat title, photo, or other settings
+  - `can_post_messages`: (Boolean) Determines if admin can create channel posts
+  - `can_edit_messages`: (Boolean) Determines if admin can edit other user's messages
+  - `can_delete_messages`: (Boolean) Determines if admin can delete other user's messages
+  - `can_invite_users`: (Boolean) Determines if admin can invite new users
+  - `can_restrict_members`: (Boolean) Determines if admin can restrict, ban, or unban chat members
+  - `can_pin_messages`: (Boolean) Determines if admin can in messages, supergroups only
+  - `can_promote_members`: (Boolean) Determines if admin can add new administrators or demote administrators that it has promoted
+  """
+  @spec promote_chat_member(chat_id, integer, keyword) :: result(:true)  
+  def promote_chat_member(chat_id, user_id, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        user_id: user_id
+      }
+      |> add_optional_params(
+        [:can_change_info,
+         :can_post_messages,
+         :can_edit_messages,
+         :can_delete_messages,
+         :can_invite_users,
+         :can_restrict_members,
+         :can_pin_messages,
+         :can_promote_members],
+         params
+      )
+
+    request("promoteChatMember", json_body)
+  end
+
+  # TODO: Test
+  @doc """
+  Same as `promote_chat_member/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec promote_chat_member!(chat_id, integer, keyword) :: :true
+  def promote_chat_member!(chat_id, user_id, params \\ []) do
+    promote_chat_member(chat_id, user_id, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to export an invite link to a supergroup or channel.
+
+  Bot must be an administrator with appropriate admin rights.
+  """
+  @spec export_chat_invite_link(chat_id) :: result(binary)
+  def export_chat_invite_link(chat_id) do
+    json_body = %{chat_id: chat_id}
+
+    request("exportChatInviteLink", json_body)
+  end
+
+  @doc """
+  Same as `export_chat_invite_link/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec export_chat_invite_link!(chat_id) :: binary
+  def export_chat_invite_link!(chat_id) do
+    export_chat_invite_link(chat_id)
     |> check_error
   end
 

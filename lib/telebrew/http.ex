@@ -46,7 +46,7 @@ defmodule Telebrew.HTTP do
             case File.open(path, [:write]) do
               {:ok, file} ->
                 IO.write(file, body)
-              
+
               x ->
                 x
             end
@@ -104,6 +104,8 @@ defmodule Telebrew.HTTP do
   end
 
   defp strings_to_atoms(atom) when is_atom(atom), do: atom
+
+  defp strings_to_atoms(str) when is_binary(str), do: str
 
   defp strings_to_atoms(list) when is_list(list), do: for(i <- list, do: strings_to_atoms(i))
 
