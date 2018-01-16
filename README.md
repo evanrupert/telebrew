@@ -72,7 +72,8 @@ defmodule YourModule do
   on "/get" do
     send_message m.chat.id, state
 
-    state # Always return state even if it is not changed
+    # Always return state even if it is not changed
+    state
   end
 
   # increment state by 1
@@ -98,7 +99,7 @@ Valid: `"/hello"`, `"/test"`, `"/no_spaces"`
 
 Invalid: `"/has spaces"`, `"no_slash"`
 
-Events are strings not prefixed with "/" and represent predefined types of messages that can be received.  For example:
+Events are strings not prefixed with `"/"` and represent predefined types of messages that can be received.  For example:
 
 Valid: `"photo"`, `"document"`, `"video_note"`
 
@@ -112,7 +113,7 @@ end
 
 # on a location message send the latitude and longitude
 on "location" do
-  send_message m.chat.id, "You are at: (#{m.location.latitude}, #{m.location.longitude})
+  send_message m.chat.id, "You are at: (#{m.location.latitude}, #{m.location.longitude})"
 end
 ```
 
