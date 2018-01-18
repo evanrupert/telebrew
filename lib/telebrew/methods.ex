@@ -1166,6 +1166,159 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  # TODO: Test
+  @doc """
+  Used to set a new profile photo for non-private chats.
+
+  The bot must be an administrator with proper rights. In non-supergroups this will only work if 
+  the 'All Members Are Admins' setting is off.
+  """
+  @spec set_chat_photo(chat_id, %{}) :: result(:true)
+  def set_chat_photo(chat_id, photo) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        photo: photo
+      }
+
+    request("setChatPhoto", json_body)
+  end
+
+  # TODO: Test
+  @doc """
+  Same as `set_chat_photo/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec set_chat_photo!(chat_id, %{}) :: :true
+  def set_chat_photo!(chat_id, photo) do
+    set_chat_photo(chat_id, photo)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to delete the chat photo
+
+  The bot must be an administrator with proper rights. In non-supergroups this will only work if 
+  the 'All Members Are Admins' setting is off.
+  """
+  @spec delete_chat_photo(chat_id) :: result(:true)
+  def delete_chat_photo(chat_id), do: request("deleteChatPhoto", %{chat_id: chat_id})
+
+  # TODO: Test
+  @doc """
+  Same as `delete_chat_photo/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec delete_Chat_photo!(chat_id) :: :true
+  def delete_chat_photo!(chat_id), do: delete_chat_photo(chat_id) |> check_error
+
+  # TODO: Test
+  @doc """
+  Used to set the title of the chat
+
+  The bot must be an administrator with proper rights.  In non-supergroups this will only work if 
+  the 'All Members Are Admins' setting is off.
+  """
+  @spec set_chat_title(chat_id, binary) :: result(:true)
+  def set_chat_title(chat_id, title) do
+    json_body = 
+      %{
+        chat_id: chat_id,
+        title: title
+      }
+
+    request("setChatTitle", json_body)
+  end
+
+  # TODO: Test
+  @doc """
+  Same as `set_chat_title/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec set_chat_title!(chat_id, binary) :: :true
+  def set_chat_title!(chat_id, title) do
+    set_chat_title(chat_id, title)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to change the description of a supergroup or channel
+
+  The bot must be an administrator with proper rights
+
+  ## Optional Parameters ##
+  - `description`: (String) New description, 0-255 characters
+  """
+  @spec set_chat_description(chat_id, keyword) :: result(:true)
+  def set_chat_description(chat_id, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id
+      }
+      |> add_optional_params([:description], params)
+
+    request("setChatDescription", json_body)
+  end
+
+  # TODO: Test
+  @doc """
+  Same as `set_chat_description/1` but will raise `Telebrew.Error` on failure
+  """
+  def set_chat_description!(chat_id, params \\ []) do
+    set_chat_description(chat_id, params)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to pin a message in a supergroup or a channel.
+
+  The bot must be an administrator and must have the 'can_pin_messages' admin right in a supergroup or
+  the 'can_edit_messages' admin right in a channel
+  """
+  @spec pin_chat_message(chat_id, integer, keyword) :: result(:true)
+  def pin_chat_message(chat_id, message_id, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        message_id: message_id
+      }
+      |> add_optional_params([:disable_notification], params)
+
+    request("pinChatMessage", json_body)
+  end
+
+  # TODO: Test
+  @doc """
+  Same as `pin_chat_message/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec pin_chat_message!(chat_id, integer, keyword) :: :true
+  def pin_chat_message!(chat_id, message_id, params \\ []) do
+    pin_chat_message(chat_id, message_id, params)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to unpin a message in a supergroup or channel
+
+  The bot must be an administrator and must have the 'can_pin_messages' admin right in a supergroup or
+  the 'can_edit_messages' admin right in a channel
+  """
+  @spec unpin_chat_message(chat_id) :: result(:true)
+  def unpin_chat_message(chat_id) do
+    request("unpinChatMessage", %{chat_id: chat_id})
+  end
+
+  # TODO: Test
+  @doc """
+  Same as `unpin_chat_message/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec unpin_chat_message!(chat_id) :: :true
+  def unpin_chat_message!(chat_id) do
+    unpin_chat_message(chat_id)
+    |> check_error
+  end
+
   # Helper Functions
 
   defp check_error({:ok, resp}), do: resp
