@@ -103,11 +103,9 @@ defmodule Telebrew.HTTP do
     end
   end
 
-  defp strings_to_atoms(atom) when is_atom(atom), do: atom
-
-  defp strings_to_atoms(str) when is_binary(str), do: str
-
   defp strings_to_atoms(list) when is_list(list), do: for(i <- list, do: strings_to_atoms(i))
+
+  defp strings_to_atoms(resp) when not is_map(resp), do: resp
 
   defp strings_to_atoms(map) do
     for {key, val} <- map, into: %{} do
