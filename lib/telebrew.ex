@@ -42,7 +42,7 @@ defmodule Telebrew do
         {:ok, _pid} =
           Supervisor.start_link(
             [
-              {Telebrew.Stash, {__MODULE__, @events, @state}},
+              {Telebrew.Stash, {__MODULE__, @events, {@state, %{}}}},
               Telebrew.Listener,
               Telebrew.Polling
             ],
