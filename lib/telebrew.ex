@@ -39,6 +39,7 @@ defmodule Telebrew do
       def start do
         # Start Listener to listen for updates from polling
         # Start Stash to save state in case of Listener failure 
+        # Start Polling to poll the server for updates and send them to the Listener
         {:ok, _pid} =
           Supervisor.start_link(
             [
@@ -66,7 +67,6 @@ defmodule Telebrew do
   ## Events ##
 
   - `text`: Will match on any text without a command
-  - `default`: Will match any message that is not defined otherwise
   - `photo`: Will match any photo
   - `sticker`: Will match any sticker
   - `audio`: Will match any audio file
@@ -77,6 +77,7 @@ defmodule Telebrew do
   - `venue`: Will match a sent venue
   - `contact`: Will match on a phone contact
   - `location`: Will match any location message
+  - `default`: Will match any message that is not defined otherwise
 
   ## Examples ##
       # will be called on any message prefixed by '/test'
@@ -92,6 +93,7 @@ defmodule Telebrew do
   defmacro on(match, options \\ [], _do = [do: do_block]) do
     when_block = Keyword.get(options, :when, true)
 
+    # Evaluate match before use to add support for using sigils as the command or event name
     {evaluated_match, _} = Code.eval_quoted(match)
 
     # if given match is a list create multiple identical functions with different names
@@ -150,6 +152,7 @@ defmodule Telebrew do
           # Used to get rid of m not used warnings
           _ = var!(m)
 
+          # Only run do block if the when guard is true
           if unquote(when_block) do
             unquote(do_block)
           else

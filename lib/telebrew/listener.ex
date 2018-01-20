@@ -49,6 +49,7 @@ defmodule Telebrew.Listener do
     log_message(message)
 
     new_state =
+      # Determine if the message should be handled as a command or event
       cond do
         Map.has_key?(message, :text) and String.starts_with?(message.text, "/") ->
           handle_command(module, events, message, state)
@@ -133,6 +134,7 @@ defmodule Telebrew.Listener do
   end
 
   defp log_message(message) do
+    # Find the type of message then display a special log message based on the type
     log_message =
       cond do
         Map.has_key?(message, :text) ->

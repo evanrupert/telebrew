@@ -48,10 +48,9 @@ defmodule Telebrew.Polling do
     try do
       updates = Telebrew.HTTP.request!("getUpdates", %{offset: last_update_id})
       last_update = List.last(updates)
-      # Logger.debug "Last update: #{last_update.message.text}" # DEBUG
-
+      
+      # If the last_update has not been processed then send it to the listener, else wait then poll again
       if not is_nil(last_update) and last_update.update_id != last_update_id do
-        # TESTING
         Telebrew.Listener.update(last_update.message)
         :timer.sleep(@interval)
         polling(last_update.update_id)
