@@ -92,13 +92,15 @@ defmodule Telebrew do
   defmacro on(match, options \\ [], _do = [do: do_block]) do
     when_block = Keyword.get(options, :when, true)
 
+    {evaluated_match, _} = Code.eval_quoted(match)
+
     # if given match is a list create multiple identical functions with different names
-    if is_list(match) do
-      for m <- match do
+    if is_list(evaluated_match) do
+      for m <- evaluated_match do
         add_function(m, when_block, do_block)
       end
     else
-      add_function(match, when_block, do_block)
+      add_function(evaluated_match, when_block, do_block)
     end
   end
 
