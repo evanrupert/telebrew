@@ -5,7 +5,7 @@ defmodule Testing do
 
   on ~w(/t /test) do
     send_message(m.chat.id, "System is up")
-  
+
     state
   end
 
@@ -28,5 +28,4 @@ defmodule Testing do
 
     state
   end
-
 end

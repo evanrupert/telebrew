@@ -48,8 +48,8 @@ defmodule Telebrew.Listener do
   def handle_cast({:update, message}, {module, events, state}) do
     log_message(message)
 
+    # Determine if the message should be handled as a command or event
     new_state =
-      # Determine if the message should be handled as a command or event
       cond do
         Map.has_key?(message, :text) and String.starts_with?(message.text, "/") ->
           handle_command(module, events, message, state)
@@ -73,13 +73,15 @@ defmodule Telebrew.Listener do
     chat_id = new_message.chat.id
 
     # Attempt to get this chat's state from the states map and if nil make a new entry for this chat starting at start state
-    {state, new_states} = case states[chat_id] do
-      nil -> 
-        {start_state, Map.put(states, chat_id, start_state)}
+    {state, new_states} =
+      case states[chat_id] do
+        nil ->
+          {start_state, Map.put(states, chat_id, start_state)}
 
-      state ->
-        {state, states}
-    end
+        state ->
+          {state, states}
+      end
+
     # call listeners and get new state
     cond do
       # if match exists call that function 
@@ -100,15 +102,16 @@ defmodule Telebrew.Listener do
 
   defp handle_event(module, message, {start_state, states}) do
     chat_id = message.chat.id
-    
-    # Attempt to get this chat's state from the states map and if nil make a new entry for this chat starting at start state
-    {state, new_states} = case states[chat_id] do
-      nil -> 
-        {start_state, Map.put(states, chat_id, start_state)}
 
-      state ->
-        {state, states}
-    end
+    # Attempt to get this chat's state from the states map and if nil make a new entry for this chat starting at start state
+    {state, new_states} =
+      case states[chat_id] do
+        nil ->
+          {start_state, Map.put(states, chat_id, start_state)}
+
+        state ->
+          {state, states}
+      end
 
     # reduce over all event types to find the matching listener
     {matched, new_state} =
@@ -117,7 +120,6 @@ defmodule Telebrew.Listener do
         # if the message is one of the events and a listener has been defined call it and replace the old state value
         if not matched and Map.has_key?(message, event) and
              Keyword.has_key?(module.__info__(:functions), event) do
-
           {true, apply(module, event, [message, state])}
         else
           {matched, state}

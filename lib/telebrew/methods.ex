@@ -342,23 +342,23 @@ defmodule Telebrew.Methods do
   Represents one member of a chat
   """
   @type chat_member :: %{
-    :user => user,
-    :status => binary,
-    optional(:until_date) => integer,
-    optional(:can_be_edited) => boolean,
-    optional(:can_change_info) => boolean,
-    optional(:can_post_messages) => boolean,
-    optional(:can_edit_messages) => boolean,
-    optional(:can_delete_messages) => boolean,
-    optional(:can_invite_users) => boolean,
-    optional(:can_restrict_members) => boolean,
-    optional(:can_pin_messages) => boolean,
-    optional(:can_promote_members) => boolean,
-    optional(:can_send_messages) => boolean,
-    optional(:can_send_media_messages) => boolean,
-    optional(:can_send_other_messages) => boolean,
-    optional(:can_add_web_page_previews) => boolean
-  }
+          :user => user,
+          :status => binary,
+          optional(:until_date) => integer,
+          optional(:can_be_edited) => boolean,
+          optional(:can_change_info) => boolean,
+          optional(:can_post_messages) => boolean,
+          optional(:can_edit_messages) => boolean,
+          optional(:can_delete_messages) => boolean,
+          optional(:can_invite_users) => boolean,
+          optional(:can_restrict_members) => boolean,
+          optional(:can_pin_messages) => boolean,
+          optional(:can_promote_members) => boolean,
+          optional(:can_send_messages) => boolean,
+          optional(:can_send_media_messages) => boolean,
+          optional(:can_send_other_messages) => boolean,
+          optional(:can_add_web_page_previews) => boolean
+        }
 
   @moduledoc """
   This module stores all of the abstractions over the telegram bot api methods
@@ -1087,30 +1087,32 @@ defmodule Telebrew.Methods do
   - `can_send_other_messages`: (Boolean) Determines if the user should be able to send animations, games, stickers, and user inline bots
   - `can_add_web_page_previews`: (Boolean) Determines if the user should be able to add web page previews to their messages
   """
-  @spec restrict_chat_member(chat_id, integer, keyword) :: result(:true)
+  @spec restrict_chat_member(chat_id, integer, keyword) :: result(true)
   def restrict_chat_member(chat_id, user_id, params \\ []) do
-    json_body = 
+    json_body =
       %{
         chat_id: chat_id,
         user_id: user_id
       }
       |> add_optional_params(
-        [:until_date,
-         :can_send_messages,
-         :can_send_media_messages,
-         :can_send_other_messages,
-         :can_add_web_page_previews],
-         params
+        [
+          :until_date,
+          :can_send_messages,
+          :can_send_media_messages,
+          :can_send_other_messages,
+          :can_add_web_page_previews
+        ],
+        params
       )
 
-      request("restrictChatMember", json_body)
+    request("restrictChatMember", json_body)
   end
 
   # TODO: Test
   @doc """
   Same as `restrict_chat_member/2` but will raise `Telebrew.Error` on failure
   """
-  @spec restrict_chat_member!(chat_id, integer, keyword) :: :true 
+  @spec restrict_chat_member!(chat_id, integer, keyword) :: true
   def restrict_chat_member!(chat_id, user_id, params \\ []) do
     restrict_chat_member(chat_id, user_id, params)
     |> check_error
@@ -1134,7 +1136,7 @@ defmodule Telebrew.Methods do
   - `can_pin_messages`: (Boolean) Determines if admin can in messages, supergroups only
   - `can_promote_members`: (Boolean) Determines if admin can add new administrators or demote administrators that it has promoted
   """
-  @spec promote_chat_member(chat_id, integer, keyword) :: result(:true)  
+  @spec promote_chat_member(chat_id, integer, keyword) :: result(true)
   def promote_chat_member(chat_id, user_id, params \\ []) do
     json_body =
       %{
@@ -1142,15 +1144,17 @@ defmodule Telebrew.Methods do
         user_id: user_id
       }
       |> add_optional_params(
-        [:can_change_info,
-         :can_post_messages,
-         :can_edit_messages,
-         :can_delete_messages,
-         :can_invite_users,
-         :can_restrict_members,
-         :can_pin_messages,
-         :can_promote_members],
-         params
+        [
+          :can_change_info,
+          :can_post_messages,
+          :can_edit_messages,
+          :can_delete_messages,
+          :can_invite_users,
+          :can_restrict_members,
+          :can_pin_messages,
+          :can_promote_members
+        ],
+        params
       )
 
     request("promoteChatMember", json_body)
@@ -1160,7 +1164,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `promote_chat_member/2` but will raise `Telebrew.Error` on failure
   """
-  @spec promote_chat_member!(chat_id, integer, keyword) :: :true
+  @spec promote_chat_member!(chat_id, integer, keyword) :: true
   def promote_chat_member!(chat_id, user_id, params \\ []) do
     promote_chat_member(chat_id, user_id, params)
     |> check_error
@@ -1194,13 +1198,12 @@ defmodule Telebrew.Methods do
   The bot must be an administrator with proper rights. In non-supergroups this will only work if 
   the 'All Members Are Admins' setting is off.
   """
-  @spec set_chat_photo(chat_id, %{}) :: result(:true)
+  @spec set_chat_photo(chat_id, %{}) :: result(true)
   def set_chat_photo(chat_id, photo) do
-    json_body =
-      %{
-        chat_id: chat_id,
-        photo: photo
-      }
+    json_body = %{
+      chat_id: chat_id,
+      photo: photo
+    }
 
     request("setChatPhoto", json_body)
   end
@@ -1209,7 +1212,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `set_chat_photo/2` but will raise `Telebrew.Error` on failure
   """
-  @spec set_chat_photo!(chat_id, %{}) :: :true
+  @spec set_chat_photo!(chat_id, %{}) :: true
   def set_chat_photo!(chat_id, photo) do
     set_chat_photo(chat_id, photo)
     |> check_error
@@ -1222,14 +1225,14 @@ defmodule Telebrew.Methods do
   The bot must be an administrator with proper rights. In non-supergroups this will only work if 
   the 'All Members Are Admins' setting is off.
   """
-  @spec delete_chat_photo(chat_id) :: result(:true)
+  @spec delete_chat_photo(chat_id) :: result(true)
   def delete_chat_photo(chat_id), do: request("deleteChatPhoto", %{chat_id: chat_id})
 
   # TODO: Test
   @doc """
   Same as `delete_chat_photo/1` but will raise `Telebrew.Error` on failure
   """
-  @spec delete_chat_photo!(chat_id) :: :true
+  @spec delete_chat_photo!(chat_id) :: true
   def delete_chat_photo!(chat_id), do: delete_chat_photo(chat_id) |> check_error
 
   # TODO: Test
@@ -1239,13 +1242,12 @@ defmodule Telebrew.Methods do
   The bot must be an administrator with proper rights.  In non-supergroups this will only work if 
   the 'All Members Are Admins' setting is off.
   """
-  @spec set_chat_title(chat_id, binary) :: result(:true)
+  @spec set_chat_title(chat_id, binary) :: result(true)
   def set_chat_title(chat_id, title) do
-    json_body = 
-      %{
-        chat_id: chat_id,
-        title: title
-      }
+    json_body = %{
+      chat_id: chat_id,
+      title: title
+    }
 
     request("setChatTitle", json_body)
   end
@@ -1254,7 +1256,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `set_chat_title/2` but will raise `Telebrew.Error` on failure
   """
-  @spec set_chat_title!(chat_id, binary) :: :true
+  @spec set_chat_title!(chat_id, binary) :: true
   def set_chat_title!(chat_id, title) do
     set_chat_title(chat_id, title)
     |> check_error
@@ -1269,7 +1271,7 @@ defmodule Telebrew.Methods do
   ## Optional Parameters ##
   - `description`: (String) New description, 0-255 characters
   """
-  @spec set_chat_description(chat_id, keyword) :: result(:true)
+  @spec set_chat_description(chat_id, keyword) :: result(true)
   def set_chat_description(chat_id, params \\ []) do
     json_body =
       %{
@@ -1295,7 +1297,7 @@ defmodule Telebrew.Methods do
   The bot must be an administrator and must have the 'can_pin_messages' admin right in a supergroup or
   the 'can_edit_messages' admin right in a channel
   """
-  @spec pin_chat_message(chat_id, integer, keyword) :: result(:true)
+  @spec pin_chat_message(chat_id, integer, keyword) :: result(true)
   def pin_chat_message(chat_id, message_id, params \\ []) do
     json_body =
       %{
@@ -1310,7 +1312,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `pin_chat_message/2` but will raise `Telebrew.Error` on failure
   """
-  @spec pin_chat_message!(chat_id, integer, keyword) :: :true
+  @spec pin_chat_message!(chat_id, integer, keyword) :: true
   def pin_chat_message!(chat_id, message_id, params \\ []) do
     pin_chat_message(chat_id, message_id, params)
     |> check_error
@@ -1322,7 +1324,7 @@ defmodule Telebrew.Methods do
   The bot must be an administrator and must have the 'can_pin_messages' admin right in a supergroup or
   the 'can_edit_messages' admin right in a channel
   """
-  @spec unpin_chat_message(chat_id) :: result(:true)
+  @spec unpin_chat_message(chat_id) :: result(true)
   def unpin_chat_message(chat_id) do
     request("unpinChatMessage", %{chat_id: chat_id})
   end
@@ -1330,7 +1332,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `unpin_chat_message/1` but will raise `Telebrew.Error` on failure
   """
-  @spec unpin_chat_message!(chat_id) :: :true
+  @spec unpin_chat_message!(chat_id) :: true
   def unpin_chat_message!(chat_id) do
     unpin_chat_message(chat_id)
     |> check_error
@@ -1339,7 +1341,7 @@ defmodule Telebrew.Methods do
   @doc """
   Used to leave a group, supergroup, or channel
   """
-  @spec leave_chat(chat_id) :: result(:true)
+  @spec leave_chat(chat_id) :: result(true)
   def leave_chat(chat_id) do
     request("leaveChat", %{chat_id: chat_id})
   end
@@ -1347,7 +1349,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `leave_chat/1` but will raise `Telebrew.Error` on failure
   """
-  @spec leave_chat!(chat_id) :: :true
+  @spec leave_chat!(chat_id) :: true
   def leave_chat!(chat_id) do
     leave_chat(chat_id)
     |> check_error
@@ -1409,12 +1411,11 @@ defmodule Telebrew.Methods do
   """
   @spec get_chat_member(chat_id, integer) :: result(chat_member)
   def get_chat_member(chat_id, user_id) do
-    json_body =
-      %{
-        chat_id: chat_id,
-        user_id: user_id
-      }
-      
+    json_body = %{
+      chat_id: chat_id,
+      user_id: user_id
+    }
+
     request("getChatMember", json_body)
   end
 
@@ -1433,13 +1434,12 @@ defmodule Telebrew.Methods do
 
   The bot must be an administrator and have proper admin rights
   """
-  @spec set_chat_sticker_set(chat_id, binary) :: result(:true)
+  @spec set_chat_sticker_set(chat_id, binary) :: result(true)
   def set_chat_sticker_set(chat_id, sticker_set_name) do
-    json_body =
-      %{
-        chat_id: chat_id,
-        sticker_set_name: sticker_set_name
-      }
+    json_body = %{
+      chat_id: chat_id,
+      sticker_set_name: sticker_set_name
+    }
 
     request("setChatStickerSet", json_body)
   end
@@ -1448,7 +1448,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `set_chat_sticker_set/2` but will raise `Telebrew.Error` on failure
   """
-  @spec set_chat_sticker_set!(chat_id, binary) :: :true
+  @spec set_chat_sticker_set!(chat_id, binary) :: true
   def set_chat_sticker_set!(chat_id, sticker_set_name) do
     set_chat_sticker_set(chat_id, sticker_set_name)
     |> check_error
@@ -1460,7 +1460,7 @@ defmodule Telebrew.Methods do
 
   The bot must be an administrator and have proper admin rights
   """
-  @spec delete_chat_sticker_set(chat_id) :: result(:true)
+  @spec delete_chat_sticker_set(chat_id) :: result(true)
   def delete_chat_sticker_set(chat_id) do
     request("deleteChatStickerSet", %{chat_id: chat_id})
   end
@@ -1469,7 +1469,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `delete_chat_sticker_set/1` but will raise `Telebrew.Error` on failure
   """
-  @spec delete_chat_sticker_set!(chat_id) :: :true
+  @spec delete_chat_sticker_set!(chat_id) :: true
   def delete_chat_sticker_set!(chat_id) do
     delete_chat_sticker_set(chat_id)
     |> check_error
@@ -1480,16 +1480,16 @@ defmodule Telebrew.Methods do
   Used to send answers to callback queries sent from inline keyboards.
 
   The answer will be displayed to the user as a notification
-  
+
   ## Optional Parameters ##
   - `text`: (String) Text of the notification, if not specified nothing will be shown, 0-200 characters
   - `show_alert`: (Boolean) If true an alert will be shown by the client instead of a notification at the top of the chat screen, defaults to false
   - `url`: (String) Url that will be opened by the user's client
   - `cache_time`: (Integer) The maximum amount of time in seconds that the result of the callback query may be cached client-side, defaults to 0
   """
-  @spec answer_callback_query(binary, keyword) :: :true
+  @spec answer_callback_query(binary, keyword) :: true
   def answer_callback_query(callback_query_id, params \\ []) do
-    json_body = 
+    json_body =
       %{callback_query_id: callback_query_id}
       |> add_optional_params(
         [:text, :show_alert, :url, :cache_time],
@@ -1503,7 +1503,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `answer_callback_query/1` but will raise `Telebrew.Error` on failure
   """
-  @spec answer_callback_query!(binary, keyword) :: :true
+  @spec answer_callback_query!(binary, keyword) :: true
   def answer_callback_query!(callback_query_id, params \\ []) do
     answer_callback_query(callback_query_id, params)
     |> check_error
