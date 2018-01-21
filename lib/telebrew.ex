@@ -106,6 +106,37 @@ defmodule Telebrew do
     end
   end
 
+  @doc """
+  Shorthand representation of send_message that will send the text to the chat that sent the message.
+
+  Text must implement the String.Chars protocol.s
+
+  ## Example ##
+      on "/test" do
+        respond "Hello"
+      end
+
+      # Same as
+
+      on "/test" do
+        send_message(m.chat.id, "Hello")
+      end
+  """
+  defmacro respond(text) do
+    quote do
+      try do
+        t = unquote(text) |> to_string
+
+        m = var!(m)
+
+        send_message(m.chat.id, t)
+      rescue
+        ArgumentError ->
+          raise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
+      end
+    end
+  end
+
   defp add_function(match, when_block, do_block) do
     match_atom = String.to_atom(match)
 

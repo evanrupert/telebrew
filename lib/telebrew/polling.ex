@@ -3,13 +3,13 @@ defmodule Telebrew.Polling do
 
   require Logger
 
-  @interval unless Application.get_env(:telebrew, :polling_interval),
-              do: 1000,
-              else: Application.get_env(:telebrew, :polling_interval)
-
   @timeout_interval unless Application.get_env(:telebrew, :timeout_interval),
                       do: 200,
                       else: Application.get_env(:telebrew, :timeout_interval)
+
+  @long_polling_timeout unless Application.get_env(:telebrew, :long_polling_timeout),
+                          do: 10_000,
+                          else: Application.get_env(:telebrew, :long_polling_timeout)
 
   def start_link(_args) do
     Task.start_link(__MODULE__, :run, [])
@@ -46,16 +46,14 @@ defmodule Telebrew.Polling do
   defp polling(last_update_id) do
     # try to poll updates, if :timeout is received try again
     try do
-      updates = Telebrew.HTTP.request!("getUpdates", %{offset: last_update_id})
+      updates = Telebrew.HTTP.request!("getUpdates", %{offset: last_update_id, timeout: @long_polling_timeout})
       last_update = List.last(updates)
 
       # If the last_update has not been processed then send it to the listener, else wait then poll again
       if not is_nil(last_update) and last_update.update_id != last_update_id do
         Telebrew.Listener.update(last_update.message)
-        :timer.sleep(@interval)
         polling(last_update.update_id)
       else
-        :timer.sleep(@interval)
         polling(last_update_id)
       end
     rescue

@@ -4,13 +4,13 @@ defmodule Testing do
   @state 0
 
   on ~w(/t /test) do
-    send_message(m.chat.id, "System is up")
-
+    respond "System is up"
+    
     state
   end
 
   on "/get" do
-    send_message(m.chat.id, state)
+    respond state
 
     state
   end
