@@ -31,7 +31,7 @@ config :telebrew,
 
 ## Usage
 
-In order to use telebrew you must use it in your module with:
+In order to use telebrew you must use it in your module like this:
 ```elixir
 defmodule YourModule do
   use Telebrew
@@ -40,7 +40,7 @@ defmodule YourModule do
 end
 ```
 
-Listeners are defined using the on macro and take a string, a list of strings, or a sigil and a do block.
+Listeners are defined using the `on` macro and take a string, a list of strings, or a sigil and then a do block.
 
 ```elixir
 # prints world whenever /hello or /h is sent to your bot
@@ -50,6 +50,7 @@ end
 
 # Or
 
+# Same but using the string list sigil
 on ~w(/h /hello) do
   IO.puts "world"
 end
@@ -67,6 +68,7 @@ end
 The `respond` macro will automatically send a message to the chat that sent the last message
 
 ```elixir
+# Same as above example
 on "/echo" do
   respond m.text
 end
