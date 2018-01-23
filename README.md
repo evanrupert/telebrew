@@ -22,27 +22,36 @@ $ mix deps.get
 In your configuration file add your api key and any other settings you wish to configure:
 ```elixir
 config :telebrew,
-  api_key: "<Your Api Key>"
+  api_key: <Your Api Key>
 ```
 
 #### Other optional configuration settings
-- `polling_interval`: (Integer) Amount of time in milliseconds between polling for updates, defaults to 1000
 - `timeout_interval`: (Integer) Amount of time in milliseconds to wait after network timeout before trying again, defaults to 200
+- `long_polling_timeout`: (Integer) Amount of time to wait for long polling response before resending a request, defaults to 10_000
 
 ## Usage
-In order to use telebrew you must use it in a module like this:
+
+In order to use telebrew you must use it in your module like this:
 ```elixir
 defmodule YourModule do
   use Telebrew
 
+  # Your listeners
 end
 ```
 
-Listeners are defined using the on macro and take a string or a list of strings and a do block.
+Listeners are defined using the `on` macro and take a string, a list of strings, or a sigil and then a do block.
 
 ```elixir
 # prints world whenever /hello or /h is sent to your bot
 on ["/h", "/hello"] do
+  IO.puts "world"
+end
+
+# Or
+
+# Same but using the string list sigil
+on ~w(/h /hello) do
   IO.puts "world"
 end
 ```
@@ -56,10 +65,20 @@ on "/echo" do
 end
 ```
 
+The `respond` macro will automatically send a message to the chat that sent the last message
+
+```elixir
+# Same as above example
+on "/echo" do
+  respond m.text
+end
+```
+
 ### Shared state
 
 State can be shared between listeners by defining the @state attribute in your module
-then accessing the state variable in your listeners.  **Whatever is returned from the listener will become the new state**
+then accessing the state variable in your listeners.  State is unique to each chat.
+**Whatever is returned from the listener will become the new state**
 
 ```elixir
 defmodule YourModule do
@@ -70,7 +89,7 @@ defmodule YourModule do
 
   # send the state to the user
   on "/get" do
-    send_message m.chat.id, state
+    respond state
 
     # Always return state even if it is not changed
     state
@@ -108,12 +127,12 @@ Invalid: `"has spaces"`, `"not_defined"`, `"/command"`
 ```elixir
 # called anytime a message is received with a photo
 on "photo" do
-  send_message m.chat.id, "You sent a photo"
+  respond "You sent a photo"
 end
 
 # on a location message send the latitude and longitude
 on "location" do
-  send_message m.chat.id, "You are at: (#{m.location.latitude}, #{m.location.longitude})"
+  respond "You are at: (#{m.location.latitude}, #{m.location.longitude})"
 end
 ```
 

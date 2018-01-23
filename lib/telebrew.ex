@@ -39,10 +39,11 @@ defmodule Telebrew do
       def start do
         # Start Listener to listen for updates from polling
         # Start Stash to save state in case of Listener failure 
+        # Start Polling to poll the server for updates and send them to the Listener
         {:ok, _pid} =
           Supervisor.start_link(
             [
-              {Telebrew.Stash, {__MODULE__, @events, @state}},
+              {Telebrew.Stash, {__MODULE__, @events, {@state, %{}}}},
               Telebrew.Listener,
               Telebrew.Polling
             ],
@@ -66,7 +67,6 @@ defmodule Telebrew do
   ## Events ##
 
   - `text`: Will match on any text without a command
-  - `default`: Will match any message that is not defined otherwise
   - `photo`: Will match any photo
   - `sticker`: Will match any sticker
   - `audio`: Will match any audio file
@@ -77,6 +77,7 @@ defmodule Telebrew do
   - `venue`: Will match a sent venue
   - `contact`: Will match on a phone contact
   - `location`: Will match any location message
+  - `default`: Will match any message that is not defined otherwise
 
   ## Examples ##
       # will be called on any message prefixed by '/test'
@@ -92,13 +93,47 @@ defmodule Telebrew do
   defmacro on(match, options \\ [], _do = [do: do_block]) do
     when_block = Keyword.get(options, :when, true)
 
+    # Evaluate match before use to add support for using sigils as the command or event name
+    {evaluated_match, _} = Code.eval_quoted(match)
+
     # if given match is a list create multiple identical functions with different names
-    if is_list(match) do
-      for m <- match do
+    if is_list(evaluated_match) do
+      for m <- evaluated_match do
         add_function(m, when_block, do_block)
       end
     else
-      add_function(match, when_block, do_block)
+      add_function(evaluated_match, when_block, do_block)
+    end
+  end
+
+  @doc """
+  Shorthand representation of send_message that will send the text to the chat that sent the message.
+
+  Text must implement the String.Chars protocol.s
+
+  ## Example ##
+      on "/test" do
+        respond "Hello"
+      end
+
+      # Same as
+
+      on "/test" do
+        send_message(m.chat.id, "Hello")
+      end
+  """
+  defmacro respond(text) do
+    quote do
+      try do
+        t = unquote(text) |> to_string
+
+        m = var!(m)
+
+        send_message(m.chat.id, t)
+      rescue
+        ArgumentError ->
+          raise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
+      end
     end
   end
 
@@ -148,6 +183,7 @@ defmodule Telebrew do
           # Used to get rid of m not used warnings
           _ = var!(m)
 
+          # Only run do block if the when guard is true
           if unquote(when_block) do
             unquote(do_block)
           else
