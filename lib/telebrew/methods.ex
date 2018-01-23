@@ -1509,6 +1509,75 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  # TODO: Test
+  @doc """
+  Used to edit text and game messages sent by the bot or via the bot
+  
+  ## Parameters ##
+  - `chat_id`: (Integer or String) Required if inline_message_id is not specified
+  - `message_id`: (Integer) Required of inline_message_id is not specified
+  - `inline_message_id`: (String) Required if chat_id and message_id are not specified
+  - `parse_mode`: (String) Determines of text should be parsed as markdown or html
+  - `disable_web_page_preview`: (Boolean) Determines of web page preview should be shown for link
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#editmessagetext) for more information about this option
+  """
+  @spec edit_message_text(binary, keywod) :: result(message)
+  def edit_message_text(text, params \\ []) do
+    json_body =
+      %{
+        text: text
+      }
+      |> add_optional_params(
+        [:chat_id, :message_id, :inline_message_id, :parse_mode,
+         :disable_web_page_preview, :reply_markup],
+         params
+      )
+
+    request("editMessageText", json_body)
+  end
+
+  @doc """
+  Same as `edit_message_text/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec edit_message_text!(binary, keyword) :: message
+  def edit_message_text!(text, params \\ []) do
+    edit_message_text(text, params)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to edit captions of messages sent by the bot or via the bot
+
+  ## Parameters ##
+  - `chat_id`: (Integer or String) Required if inline_message_id is not specified
+  - `message_id`: (Integer) Required of inline_message_id is not specified
+  - `inline_message_id`: (String) Required if chat_id and message_id are not specified
+  - `caption`: (String) New caption of the message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#editmessagecaption) for more information about this option
+  """
+  @spec edit_message_caption(keyword) :: result(message)
+  def edit_message_caption(params \\ []) do
+    json_body = 
+      %{}
+      |> add_optional_params(
+        [:chat_id, :message_id, :inline_message_id,
+         :caption, :reply_markup],
+         params
+      )
+    
+    request("editMessageCaption", json_body)
+  end
+
+  @doc """
+  Same as `edit_message_caption/0` but will raise `Telebrew.Error` on failure
+  """
+  @spec edit_message_caption!(keyword) :: message  
+  def edit_message_caption!(params \\ []) do
+    edit_message_caption(params)
+    |> check_error
+  end
+
   # Helper Functions
 
   defp check_error({:ok, resp}), do: resp
