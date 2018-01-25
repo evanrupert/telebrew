@@ -360,6 +360,23 @@ defmodule Telebrew.Methods do
           optional(:can_add_web_page_previews) => boolean
         }
 
+  @typedoc """
+  Represents the content of a file to be uploaded
+
+  More information can be found [here](#{@docs_address}#inputfile)
+  """
+  @type input_file :: binary | map
+
+  @typedoc """
+  Represents a sticker set
+  """
+  @type sticker_set :: %{
+          name: binary,
+          title: binary,
+          contains_masks: boolean,
+          stickers: list(sticker)
+        }
+
   @moduledoc """
   This module stores all of the abstractions over the telegram bot api methods
   """
@@ -978,7 +995,7 @@ defmodule Telebrew.Methods do
   end
 
   @doc """
-  Same as `get_user`profile_photos/1` but will raise `Telebrew.Error` on failure
+  Same as `get_user_profile_photos/1` but will raise `Telebrew.Error` on failure
   """
   @spec get_user_profile_photos!(integer, keyword) :: user_profile_photos
   def get_user_profile_photos!(user_id, params \\ []) do
@@ -1509,7 +1526,6 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
-  # TODO: Test
   @doc """
   Used to edit text and game messages sent by the bot or via the bot
   
@@ -1521,7 +1537,7 @@ defmodule Telebrew.Methods do
   - `disable_web_page_preview`: (Boolean) Determines of web page preview should be shown for link
   - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#editmessagetext) for more information about this option
   """
-  @spec edit_message_text(binary, keywod) :: result(message)
+  @spec edit_message_text(binary, keyword) :: result(message)
   def edit_message_text(text, params \\ []) do
     json_body =
       %{
@@ -1545,7 +1561,6 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
-  # TODO: Test
   @doc """
   Used to edit captions of messages sent by the bot or via the bot
 
@@ -1575,6 +1590,133 @@ defmodule Telebrew.Methods do
   @spec edit_message_caption!(keyword) :: message  
   def edit_message_caption!(params \\ []) do
     edit_message_caption(params)
+    |> check_error
+  end
+
+  # TODO: Test
+  @doc """
+  Used to edit only the reply markup of messages sent by the bot or via the bot
+  
+  ## Parameters ##
+  - `chat_id`: (Integer or String) Required if inline_message_id is not specified
+  - `message_id`: (Integer) Required of inline_message_id is not specified
+  - `inline_message_id`: (String) Required if chat_id and message_id are not specified
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#editmessagereplymarkup) for more information about this option
+  """
+  @spec edit_message_reply_markup(keyword) :: result(message | :true)
+  def edit_message_reply_markup(params \\ []) do
+    json_body = 
+      %{}
+      |> add_optional_params(
+        [:chat_id, :message_id, :inline_message_id, :reply_markup],
+        params
+      )
+
+    request("editMessageReplyMarkup", json_body)
+  end
+
+  @doc """
+  Same as `edit_message_reply_markup/0` but will throw `Telebrew.Error` on failure
+  """
+  @spec edit_message_reply_markup!(keyword) :: message | :true  
+  def edit_message_reply_markup!(params \\ []) do
+    edit_message_reply_markup(params)
+    |> check_error
+  end
+
+  @doc """
+  Used to delete a message, including service messages, with the following limitations:
+
+  - A message can only be deleted if it was sent less than 48 hours ago
+  - Bots can delete outgoing messages in groups and supergroups
+  - Bots granted `can_post_messages` permissions can delete outgoing messages in channels
+  - If the bot is an administrator of a group it can delete any messages there
+  - If the bot has `can_delete_messages` permissions in a supergroup or channel, it can delete any messages there
+  """
+  @spec delete_message(chat_id, integer) :: result(:true) 
+  def delete_message(chat_id, message_id) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        message_id: message_id
+      }
+
+    request("deleteMessage", json_body)
+  end
+
+  @doc """
+  Same as `delete_message/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec delete_message!(chat_id, integer) :: :true
+  def delete_message!(chat_id, message_id) do
+    delete_message(chat_id, message_id)
+    |> check_error
+  end
+
+  @doc """
+  Used to send .webp stickers
+  """
+  @spec send_sticker(chat_id, input_file | binary, keyword) :: result(message)
+  def send_sticker(chat_id, sticker, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        sticker: sticker
+      }
+      |> add_optional_params(
+        [:disable_notification, :reply_to_message_id, :reply_markup],
+        params
+      )
+
+    request("sendSticker", json_body)
+  end
+
+  @doc """
+  Same as `send_sticker/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec send_sticker!(chat_id, input_file | binary, keyword) :: message  
+  def send_sticker!(chat_id, sticker, params \\ []) do
+    send_sticker(chat_id, sticker, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to get a sticker set
+  """
+  @spec get_sticker_set(binary) :: result(sticker_set)
+  def get_sticker_set(name) do
+    request("getStickerSet", %{name: name})
+  end
+
+  @doc """
+  Same as `get_sticker_set/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec get_sticker_set!(binary) :: sticker_set  
+  def get_sticker_set!(name) do
+    get_sticker_set(name)
+    |> check_error
+  end
+
+  @doc """
+  Used to upload a .png file with a sticker for later use in `create_new_sticker_set/7` and `add_sticker_to_set/5`
+  """
+  @spec upload_sticker_file(integer, input_file) :: result(file)  
+  def upload_sticker_file(user_id, png_sticker) do
+    json_body =
+      %{
+        user_id: user_id,
+        png_sticker: png_sticker
+      }
+    
+    request("uploadStickerFile", json_body)
+  end
+
+  @doc """
+  Same as `upload_sticker_file/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec upload_sticker_file!(integer, input_file) :: file 
+  def upload_sticker_file!(user_id, png_sticker) do
+    upload_sticker_file(user_id, png_sticker)
     |> check_error
   end
 

@@ -137,6 +137,24 @@ defmodule Telebrew do
     end
   end
 
+  @doc """
+  Same as `respond/1` but will raise `Telebrew.Error` on failure
+  """
+  defmacro respond!(text) do
+    quote do
+      try do
+        t = unquote(text) |> to_string
+
+        m = var!(m)
+
+        send_message!(m.chat.id, t)
+      rescue
+        ArgumentError ->
+          raise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
+      end
+    end
+  end
+
   defp add_function(match, when_block, do_block) do
     match_atom = String.to_atom(match)
 
