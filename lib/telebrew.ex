@@ -37,13 +37,21 @@ defmodule Telebrew do
   defmacro __before_compile__(_env) do
     quote do
       def start do
+        initial_chat_states = %Telebrew.Listener.State{initial: @state,
+                                                      all_chats: %{},
+                                                      current_chat: nil}
+
+        initial_server_state = %Telebrew.Listener.Data{module: __MODULE__,
+                                                      listeners: @events,
+                                                      state: initial_chat_states}
         # Start Listener to listen for updates from polling
         # Start Stash to save state in case of Listener failure 
         # Start Polling to poll the server for updates and send them to the Listener
         {:ok, _pid} =
           Supervisor.start_link(
             [
-              {Telebrew.Stash, {__MODULE__, @events, {@state, %{}}}},
+              # {Telebrew.Stash, {__MODULE__, @events, {@state, %{}}}},
+              {Telebrew.Stash, initial_server_state},
               Telebrew.Listener,
               Telebrew.Polling
             ],
