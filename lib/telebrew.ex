@@ -28,7 +28,7 @@ defmodule Telebrew do
       Module.register_attribute(__MODULE__, :events, accumulate: true)
       # give init attribute to avoid the '@state is not defined' warnings
       # value is super random to avoid conflicts
-      Module.put_attribute(__MODULE__, :state, :somethingthatwillneverhappen)
+      Module.put_attribute(__MODULE__, :state, :unused_state_attribute)
 
       @before_compile unquote(__MODULE__)
     end
@@ -37,27 +37,29 @@ defmodule Telebrew do
   defmacro __before_compile__(_env) do
     quote do
       def start do
-        initial_chat_states = %Telebrew.Listener.State{initial: @state,
-                                                      all_chats: %{},
-                                                      current_chat: nil}
-
-        initial_server_state = %Telebrew.Listener.Data{module: __MODULE__,
-                                                      listeners: @events,
-                                                      state: initial_chat_states}
         # Start Listener to listen for updates from polling
         # Start Stash to save state in case of Listener failure 
         # Start Polling to poll the server for updates and send them to the Listener
         {:ok, _pid} =
           Supervisor.start_link(
             [
-              # {Telebrew.Stash, {__MODULE__, @events, {@state, %{}}}},
-              {Telebrew.Stash, initial_server_state},
+              {Telebrew.Stash, make_initial_listener_data()},
               Telebrew.Listener,
               Telebrew.Polling
             ],
             strategy: :one_for_one,
             name: Telebrew.Supervisor
           )
+      end
+
+      defp make_initial_listener_data do
+        initial_state = %Telebrew.Listener.State{
+          initial: @state,
+          all_chats: %{},
+          current_chat: nil
+        }
+
+        %Telebrew.Listener.Data{module: __MODULE__, listeners: @events, state: initial_state}
       end
 
       def stop do
@@ -201,7 +203,7 @@ defmodule Telebrew do
       @events unquote(match_atom)
 
       # If init is defined, then define state in the macro therefore warning them if a listener does not use state
-      if @state != :somethingthatwillneverhappen do
+      if @state != :unused_state_attribute do
         def unquote(match_atom)(message, state) do
           var!(m) = message
           var!(state) = state

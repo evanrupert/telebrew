@@ -3,6 +3,7 @@ defmodule Telebrew.Polling do
 
   require Logger
 
+  # The application environment is used to make the timeout intervals optionally configurable by the user
   @timeout_interval unless Application.get_env(:telebrew, :timeout_interval),
                       do: 200,
                       else: Application.get_env(:telebrew, :timeout_interval)
@@ -16,51 +17,72 @@ defmodule Telebrew.Polling do
   end
 
   def run do
-    last_update_id = get_last_update_id()
+    previous_update_id = get_last_update_id()
 
     IO.puts("\n=================")
     IO.puts("Starting Listener")
     IO.puts("=================\n")
 
-    polling(last_update_id)
+    polling(previous_update_id)
   end
 
   defp get_last_update_id do
-    # try to get last update, if :timeout is received try again
     try do
-      last_update = List.last(Telebrew.HTTP.request!("getUpdates", %{}))
-
-      if last_update do
-        last_update.update_id
-      else
-        0
-      end
+      request_last_update_with_default()
     rescue
       e in Telebrew.Error ->
-        Logger.error("Error: #{e.message}, trying again")
-        :timer.sleep(@timeout_interval)
-        get_last_update_id()
+        log_error(e)
+        attempt_function_after_delay(fn -> get_last_update_id() end)
     end
   end
 
-  defp polling(last_update_id) do
-    # try to poll updates, if :timeout is received try again
-    try do
-      updates = Telebrew.HTTP.request!("getUpdates", %{offset: last_update_id, timeout: @long_polling_timeout})
-      last_update = List.last(updates)
+  defp request_last_update_with_default do
+    last_update = get_last_update(0)
 
-      # If the last_update has not been processed then send it to the listener, else wait then poll again
-      if not is_nil(last_update) and last_update.update_id != last_update_id do
-        Telebrew.Listener.update(last_update.message)
-        polling(last_update.update_id)
-      else
-        polling(last_update_id)
-      end
+    if last_update do
+      last_update.update_id
+    else
+      0
+    end
+  end
+
+  defp polling(previous_update_id) do
+    try do
+      update_listener_if_new_update(previous_update_id)
     rescue
       e in Telebrew.Error ->
-        Logger.error("Error: #{e.message}, trying again")
-        :timer.sleep(@timeout_interval)
-        polling(last_update_id)
+        log_error(e)
+        attempt_function_after_delay(fn -> polling(previous_update_id) end)
     end
+  end
+
+  defp get_last_update(previous_update_id) do
+    updates = Telebrew.HTTP.request!("getUpdates", %{offset: previous_update_id, timeout: @long_polling_timeout})
+
+    List.last(updates)
+  end
+
+  defp update_listener_if_new_update(previous_update_id) do
+    last_update = get_last_update(previous_update_id)
+
+    if last_update_is_new?(last_update, previous_update_id) do
+      Telebrew.Listener.update(last_update.message)
+      polling(last_update.update_id)
+    else
+      polling(previous_update_id)
+    end
+  end
+
+  defp last_update_is_new?(last_update, previous_update_id) do
+    not is_nil(last_update) and last_update.update_id != previous_update_id
+  end
+
+  defp attempt_function_after_delay(fun) do
+    :timer.sleep(@timeout_interval)
+    fun.()
+  end
+
+  defp log_error(e) do
+    Logger.error("Error: #{e.message}, trying again")
   end
 end
