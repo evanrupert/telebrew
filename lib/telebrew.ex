@@ -3,21 +3,7 @@ defmodule Telebrew do
   Contains all macros for defining message event listeners
   """
 
-  # all events in the order that they will be checked in
-  @reserved_events [
-    :text,
-    :photo,
-    :sticker,
-    :audio,
-    :document,
-    :video,
-    :video_note,
-    :voice,
-    :venue,
-    :location,
-    :contact,
-    :default
-  ]
+  alias Telebrew.ReservedEvents
 
   defmacro __using__(_opts) do
     quote do
@@ -182,8 +168,7 @@ defmodule Telebrew do
       end
 
       # raise error if match is not a valid event and does not start with /
-      if not String.starts_with?(unquote(match), "/") and
-           unquote(match_atom) not in unquote(@reserved_events) do
+      if not String.starts_with?(unquote(match), "/") and not unquote(ReservedEvents.contains?(match_atom)) do
         msg =
           "Event Listener: \'#{unquote(match)}\' is not a valid command or event. Perhaps you ment \'/#{
             unquote(match)

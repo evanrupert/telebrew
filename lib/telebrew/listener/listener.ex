@@ -4,22 +4,7 @@ defmodule Telebrew.Listener do
   require Logger
 
   alias Telebrew.Listener.Data
-
-  # all events in order that they will be checked for
-  @reserved_events [
-    :text,
-    :photo,
-    :sticker,
-    :audio,
-    :document,
-    :video,
-    :video_note,
-    :voice,
-    :venue,
-    :location,
-    :contact,
-    :default
-  ]
+  alias Telebrew.ReservedEvents
 
   # Client
 
@@ -118,7 +103,7 @@ defmodule Telebrew.Listener do
     initial_state = listener_data.state.initial
     current_chat_state = get_chat_state(message, listener_data)
 
-    @reserved_events
+    ReservedEvents.get()
     |> Enum.reduce({false, initial_state}, fn event, {matched, initial} ->
       if not matched and is_valid_listener_match?(message, event, listener_data.module) do
         {true, apply(listener_data.module, event, [message, current_chat_state])}
