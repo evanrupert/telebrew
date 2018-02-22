@@ -1720,6 +1720,97 @@ defmodule Telebrew.Methods do
     |> check_error
   end
 
+  @doc """
+  Used to create a new sticker set owned by a user.
+  """
+  @spec create_new_sticker_set(integer, binary, binary, input_file or binary, binary, keyword) :: result(:true)
+  def create_new_sticker_set(user_id, name, title, png_sticker, emojis, params \\ []) do
+    json_body =
+      %{
+        user_id: user_id,
+        name: name,
+        title: title,
+        png_sticker: png_sticker,
+        emojis: emojis
+      }
+      |> add_optional_params([:contains_masks, :mask_position], params)
+
+    request("createNewStickerSet", json_body)
+  end
+
+  @doc """
+  Same as `create_new_sticker_set/5 but will raise `Telebrew.Error` on failure
+  """
+  @spec create_new_sticker_set(integer, binary, binary, input_file or binary, binary, keyword) :: :true
+  def create_new_sticker_set!(user_id, name, title, png_sticker, emojis, params \\ []) do
+    create_new_sticker_set(user_id, name, title, png_sticker, emojis, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to add a new sticker to a set created by the bot.
+  """
+  @spec add_sticker_to_set(integer, binary, input_file or binary, binary, keyword) :: result(:true)
+  def add_sticker_to_set(user_id, name, png_sticker, emojis, params \\ []) do
+    json_body =
+      %{
+        user_id: user_id,
+        name: name,
+        png_sticker: png_sticker,
+        emojis: emojis
+      }
+      |> add_optional_params([:mask_position], params)
+  end
+
+  @doc """
+  Same as `add_sticker_to_set/4` but will raise `Telebrew.Error` on failure
+  """
+  @spec add_sticker_to_set(integer, binary, input_file or binary, binary, keyword) :: :true
+  def add_sticker_to_set!(user_id, name, png_sticker, emojis, params \\ []) do
+    add_sticker_to_set(user_id, name, png_sticker, emojis, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to move a sticker in a set created by the bot to a specific position
+  """
+  @spec set_sticker_position_in_set(binary, integer) :: result(:true)
+  def set_sticker_position_in_set(sticker, position) do
+    json_body =
+      %{
+        sticker: sticker,
+        position: position
+      }
+
+    request("setStickerPositionInSet", json_body)
+  end
+
+  @doc """
+  Same as `set_sticker_position_in_set/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec set_sticker_position_in_set(binary, integer) :: :true
+  def set_sticker_position_in_set!(sticker, position) do
+    set_sticker_position_in_set(sticker, position)
+    |> check_error
+  end
+
+  @doc """
+  Used to delete a sticker from a set created by the bot.
+  """
+  @spec delete_sticker_from_set(binary) :: result(:true)
+  def delete_sticker_from_set(sticker) do
+    request("deleteStickerFromSet", %{sticker: sticker})
+  end
+
+  @doc """
+  Same as `delete_sticker_from_set/1` but will raise `Telebrew.Error` on failure
+  """
+  @spec delete_sticker_from_set(binary) :: :true
+  def delete_sticker_from_set!(sticker) do
+    delete_sticker_from_set(sticker)
+    |> check_error
+  end
+
   # Helper Functions
 
   defp check_error({:ok, resp}), do: resp
