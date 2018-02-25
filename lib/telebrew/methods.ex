@@ -386,6 +386,14 @@ defmodule Telebrew.Methods do
           stickers: list(sticker)
         }
 
+  @typedoc """
+  Represents a portion of the price for goods and services
+  """
+  @type labeled_price :: %{
+    label: binary,
+    amount: integer
+  }
+
   @doc """
   Sends a message to the given chat_id
 
@@ -1701,7 +1709,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `get_sticker_set/1` but will raise `Telebrew.Error` on failure
   """
-  @spec get_sticker_set!(binary) :: sticker_set  
+  @spec get_sticker_set!(binary) :: sticker_set
   def get_sticker_set!(name) do
     get_sticker_set(name)
     |> check_error
@@ -1710,21 +1718,21 @@ defmodule Telebrew.Methods do
   @doc """
   Used to upload a .png file with a sticker for later use in `create_new_sticker_set/7` and `add_sticker_to_set/5`
   """
-  @spec upload_sticker_file(integer, input_file) :: result(file)  
+  @spec upload_sticker_file(integer, input_file) :: result(file)
   def upload_sticker_file(user_id, png_sticker) do
     json_body =
       %{
         user_id: user_id,
         png_sticker: png_sticker
       }
-    
+
     request("uploadStickerFile", json_body)
   end
 
   @doc """
   Same as `upload_sticker_file/2` but will raise `Telebrew.Error` on failure
   """
-  @spec upload_sticker_file!(integer, input_file) :: file 
+  @spec upload_sticker_file!(integer, input_file) :: file
   def upload_sticker_file!(user_id, png_sticker) do
     upload_sticker_file(user_id, png_sticker)
     |> check_error
@@ -1855,6 +1863,50 @@ defmodule Telebrew.Methods do
   @spec answer_inline_query!(binary, list(map), keyword) :: :true
   def answer_inline_query!(inline_query_id, results, params \\ []) do
     answer_inline_query(inline_query_id, results, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to send invoices
+  """
+  @spec send_invoice(integer, binary, binary, binary, binary, binary, binary, list(labeled_price), keyword) :: result(message)
+  def send_invoice(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        title: title,
+        description: description,
+        payload: payload,
+        provider_token: provider_token,
+        start_parameter: start_parameter,
+        currency: currency,
+        prices: prices
+      }
+      |> add_optional_params([:provider_data,
+                             :photo_url,
+                             :photo_size,
+                             :photo_width,
+                             :photo_height,
+                             :need_name,
+                             :need_phone_number,
+                             :need_email,
+                             :need_shipping_address,
+                             :send_phone_number_to_provider,
+                             :send_email_to_provider,
+                             :is_flexible,
+                             :disable_notification,
+                             :reply_to_message_id,
+                             :reply_markup], params)
+
+    request("sendInvoice", json_body)
+  end
+
+  @doc """
+  Same as `send_invoice/8` but will raise `Telebrew.Error` on failure
+  """
+  @spec send_invoice(integer, binary, binary, binary, binary, binary, binary, list(labeled_price), keyword) :: result(message)
+  def send_invoice!(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params \\ []) do
+    send_invoice(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params)
     |> check_error
   end
 
