@@ -3,6 +3,15 @@ defmodule Telebrew.Methods do
 
   @docs_address "https://core.telegram.org/bots/api"
 
+  @moduledoc """
+  This module stores all of the abstractions over the telegram bot api methods
+
+  All complete telegram bot documentation can be found [here](#{@docs_address})
+
+  All methods are designed to have the required parameters as function parameters
+  where all optional parameters are in a keyword list as the last parameter of the function.
+  """
+
   @typedoc """
   Basic user map type, represents all possible options
   """
@@ -376,10 +385,6 @@ defmodule Telebrew.Methods do
           contains_masks: boolean,
           stickers: list(sticker)
         }
-
-  @moduledoc """
-  This module stores all of the abstractions over the telegram bot api methods
-  """
 
   @doc """
   Sends a message to the given chat_id
@@ -1655,6 +1660,11 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to send .webp stickers
+
+  ## Optional Parameters ##
+  - `disable_notification`: (Boolean) Disables sound or vibration of the message
+  - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendsticker) for more information about this option
   """
   @spec send_sticker(chat_id, input_file | binary, keyword) :: result(message)
   def send_sticker(chat_id, sticker, params \\ []) do
@@ -1722,6 +1732,10 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to create a new sticker set owned by a user.
+
+  ## Optional Parameters ##
+  - `contains_masks`: (Boolean) Pass true if a set of mask stickers should be created
+  - `mask_position`: (mask_position) A JSON-serialized object for where the mask should be placed on the faces
   """
   @spec create_new_sticker_set(integer, binary, binary, input_file or binary, binary, keyword) :: result(:true)
   def create_new_sticker_set(user_id, name, title, png_sticker, emojis, params \\ []) do
@@ -1749,6 +1763,9 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to add a new sticker to a set created by the bot.
+
+  ## Optional Parameter ##
+  - `mask_position`: (mask_position) A JSON-serialized object for where the mask should be placed on the faces
   """
   @spec add_sticker_to_set(integer, binary, input_file or binary, binary, keyword) :: result(:true)
   def add_sticker_to_set(user_id, name, png_sticker, emojis, params \\ []) do
@@ -1808,6 +1825,36 @@ defmodule Telebrew.Methods do
   @spec delete_sticker_from_set(binary) :: :true
   def delete_sticker_from_set!(sticker) do
     delete_sticker_from_set(sticker)
+    |> check_error
+  end
+
+  @doc """
+  Used to send answers to an inline query.
+
+  No more than 50 results per query are allowed.
+  """
+  @spec answer_inline_query(binary, list(map), keyword) :: result(:true)
+  def answer_inline_query(inline_query_id, results, params \\ []) do
+    json_body =
+      %{
+        inline_query_id: inline_query_id,
+        results: results
+      }
+      |> add_optional_params([:cache_time,
+                             :is_personal,
+                             :next_offset,
+                             :switch_pm_text,
+                             :switch_pm_parameter], params)
+
+    request("answerInlineQuery", json_body)
+  end
+
+  @doc """
+  Same as `answer_inline_query/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec answer_inline_query!(binary, list(map), keyword) :: :true
+  def answer_inline_query!(inline_query_id, results, params \\ []) do
+    answer_inline_query(inline_query_id, results, params)
     |> check_error
   end
 
