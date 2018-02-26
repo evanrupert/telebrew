@@ -1868,6 +1868,8 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to send invoices
+
+  See #{@docs_address}#sendinvoice for parameter documentation
   """
   @spec send_invoice(integer, binary, binary, binary, binary, binary, binary, list(labeled_price), keyword) :: result(message)
   def send_invoice(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params \\ []) do
@@ -1907,6 +1909,64 @@ defmodule Telebrew.Methods do
   @spec send_invoice(integer, binary, binary, binary, binary, binary, binary, list(labeled_price), keyword) :: result(message)
   def send_invoice!(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params \\ []) do
     send_invoice(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to reply to shipping queries
+
+  ## Optional Parameters ##
+  - `shipping_options`: (List of maps) A JSON-serialized array of available shipping options
+  - `error_message`: (String) Required if ok is false. Human readable form that explaines why the order failed
+  """
+  @spec answer_shipping_query(binary, boolean, keyword) :: result(:true)
+  def answer_shipping_query(shipping_query_id, ok, params \\ []) do
+    json_body =
+      %{
+        shipping_query_id: shipping_query_id,
+        ok: ok
+      }
+      |> add_optional_params([:shipping_options, :error_message], params)
+
+    request("answerShippingQuery", json_body)
+  end
+
+  @doc """
+  Same as `answer_shipping_query/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec answer_shipping_query!(binary, boolean, keyword) :: :true
+  def answer_shipping_query!(shipping_query_id, ok, params \\ []) do
+    answer_shipping_query(shipping_query_id, ok, params)
+    |> check_error
+  end
+
+  @doc """
+  Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an Update with the field pre_checkout_query.
+  Use this method to respond to such pre-checkout queries.
+
+  Note: The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.
+
+  ## Optional Parameter ##
+  - `error_message`: (String) Required if ok is false. Human readable form that explaines why the order failed
+  """
+  @spec answer_pre_checkout_query(binary, boolean, keyword) :: result(:true)
+  def answer_pre_checkout_query(pre_checkout_query_id, ok, params \\ []) do
+    json_body =
+      %{
+        pre_checkout_query_id: pre_checkout_query_id,
+        ok: ok
+      }
+      |> add_optional_params([:error_message], params)
+
+    request("answerPreCheckoutQuery", json_body)
+  end
+
+  @doc """
+  Same as `answer_pre_checkout_query/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec answer_pre_checkout_query!(binary, boolean, keyword) :: :true
+  def answer_pre_checkout_query!(pre_checkout_query_id, ok, params \\ []) do
+    answer_pre_checkout_query(pre_checkout_query_id, ok, params)
     |> check_error
   end
 
