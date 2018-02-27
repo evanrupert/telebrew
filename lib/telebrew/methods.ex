@@ -1723,7 +1723,7 @@ defmodule Telebrew.Methods do
   @doc """
   Used to create a new sticker set owned by a user.
   """
-  @spec create_new_sticker_set(integer, binary, binary, input_file or binary, binary, keyword) :: result(:true)
+  @spec create_new_sticker_set(integer, binary, binary, input_file | binary, binary, keyword) :: result(:true)
   def create_new_sticker_set(user_id, name, title, png_sticker, emojis, params \\ []) do
     json_body =
       %{
@@ -1741,7 +1741,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `create_new_sticker_set/5 but will raise `Telebrew.Error` on failure
   """
-  @spec create_new_sticker_set(integer, binary, binary, input_file or binary, binary, keyword) :: :true
+  @spec create_new_sticker_set(integer, binary, binary, input_file | binary, binary, keyword) :: :true
   def create_new_sticker_set!(user_id, name, title, png_sticker, emojis, params \\ []) do
     create_new_sticker_set(user_id, name, title, png_sticker, emojis, params)
     |> check_error
@@ -1750,7 +1750,7 @@ defmodule Telebrew.Methods do
   @doc """
   Used to add a new sticker to a set created by the bot.
   """
-  @spec add_sticker_to_set(integer, binary, input_file or binary, binary, keyword) :: result(:true)
+  @spec add_sticker_to_set(integer, binary, input_file | binary, binary, keyword) :: result(:true)
   def add_sticker_to_set(user_id, name, png_sticker, emojis, params \\ []) do
     json_body =
       %{
@@ -1760,12 +1760,14 @@ defmodule Telebrew.Methods do
         emojis: emojis
       }
       |> add_optional_params([:mask_position], params)
+
+    request("addStickerToSet", json_body)
   end
 
   @doc """
   Same as `add_sticker_to_set/4` but will raise `Telebrew.Error` on failure
   """
-  @spec add_sticker_to_set(integer, binary, input_file or binary, binary, keyword) :: :true
+  @spec add_sticker_to_set(integer, binary, input_file | binary, binary, keyword) :: :true
   def add_sticker_to_set!(user_id, name, png_sticker, emojis, params \\ []) do
     add_sticker_to_set(user_id, name, png_sticker, emojis, params)
     |> check_error
