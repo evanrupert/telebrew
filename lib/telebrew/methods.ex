@@ -3,6 +3,15 @@ defmodule Telebrew.Methods do
 
   @docs_address "https://core.telegram.org/bots/api"
 
+  @moduledoc """
+  This module stores all of the abstractions over the telegram bot api methods
+
+  All complete telegram bot documentation can be found [here](#{@docs_address})
+
+  All methods are designed to have the required parameters as function parameters
+  where all optional parameters are in a keyword list as the last parameter of the function.
+  """
+
   @typedoc """
   Basic user map type, represents all possible options
   """
@@ -377,9 +386,13 @@ defmodule Telebrew.Methods do
           stickers: list(sticker)
         }
 
-  @moduledoc """
-  This module stores all of the abstractions over the telegram bot api methods
+  @typedoc """
+  Represents a portion of the price for goods and services
   """
+  @type labeled_price :: %{
+    label: binary,
+    amount: integer
+  }
 
   @doc """
   Sends a message to the given chat_id
@@ -1655,6 +1668,11 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to send .webp stickers
+
+  ## Optional Parameters ##
+  - `disable_notification`: (Boolean) Disables sound or vibration of the message
+  - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendsticker) for more information about this option
   """
   @spec send_sticker(chat_id, input_file | binary, keyword) :: result(message)
   def send_sticker(chat_id, sticker, params \\ []) do
@@ -1691,7 +1709,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `get_sticker_set/1` but will raise `Telebrew.Error` on failure
   """
-  @spec get_sticker_set!(binary) :: sticker_set  
+  @spec get_sticker_set!(binary) :: sticker_set
   def get_sticker_set!(name) do
     get_sticker_set(name)
     |> check_error
@@ -1700,21 +1718,21 @@ defmodule Telebrew.Methods do
   @doc """
   Used to upload a .png file with a sticker for later use in `create_new_sticker_set/7` and `add_sticker_to_set/5`
   """
-  @spec upload_sticker_file(integer, input_file) :: result(file)  
+  @spec upload_sticker_file(integer, input_file) :: result(file)
   def upload_sticker_file(user_id, png_sticker) do
     json_body =
       %{
         user_id: user_id,
         png_sticker: png_sticker
       }
-    
+
     request("uploadStickerFile", json_body)
   end
 
   @doc """
   Same as `upload_sticker_file/2` but will raise `Telebrew.Error` on failure
   """
-  @spec upload_sticker_file!(integer, input_file) :: file 
+  @spec upload_sticker_file!(integer, input_file) :: file
   def upload_sticker_file!(user_id, png_sticker) do
     upload_sticker_file(user_id, png_sticker)
     |> check_error
@@ -1722,6 +1740,10 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to create a new sticker set owned by a user.
+
+  ## Optional Parameters ##
+  - `contains_masks`: (Boolean) Pass true if a set of mask stickers should be created
+  - `mask_position`: (mask_position) A JSON-serialized object for where the mask should be placed on the faces
   """
   @spec create_new_sticker_set(integer, binary, binary, input_file | binary, binary, keyword) :: result(:true)
   def create_new_sticker_set(user_id, name, title, png_sticker, emojis, params \\ []) do
@@ -1749,6 +1771,9 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to add a new sticker to a set created by the bot.
+
+  ## Optional Parameter ##
+  - `mask_position`: (mask_position) A JSON-serialized object for where the mask should be placed on the faces
   """
   @spec add_sticker_to_set(integer, binary, input_file | binary, binary, keyword) :: result(:true)
   def add_sticker_to_set(user_id, name, png_sticker, emojis, params \\ []) do
@@ -1810,6 +1835,140 @@ defmodule Telebrew.Methods do
   @spec delete_sticker_from_set(binary) :: :true
   def delete_sticker_from_set!(sticker) do
     delete_sticker_from_set(sticker)
+    |> check_error
+  end
+
+  @doc """
+  Used to send answers to an inline query.
+
+  No more than 50 results per query are allowed.
+  """
+  @spec answer_inline_query(binary, list(map), keyword) :: result(:true)
+  def answer_inline_query(inline_query_id, results, params \\ []) do
+    json_body =
+      %{
+        inline_query_id: inline_query_id,
+        results: results
+      }
+      |> add_optional_params([:cache_time,
+                             :is_personal,
+                             :next_offset,
+                             :switch_pm_text,
+                             :switch_pm_parameter], params)
+
+    request("answerInlineQuery", json_body)
+  end
+
+  @doc """
+  Same as `answer_inline_query/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec answer_inline_query!(binary, list(map), keyword) :: :true
+  def answer_inline_query!(inline_query_id, results, params \\ []) do
+    answer_inline_query(inline_query_id, results, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to send invoices
+
+  See #{@docs_address}#sendinvoice for parameter documentation
+  """
+  @spec send_invoice(integer, binary, binary, binary, binary, binary, binary, list(labeled_price), keyword) :: result(message)
+  def send_invoice(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        title: title,
+        description: description,
+        payload: payload,
+        provider_token: provider_token,
+        start_parameter: start_parameter,
+        currency: currency,
+        prices: prices
+      }
+      |> add_optional_params([:provider_data,
+                             :photo_url,
+                             :photo_size,
+                             :photo_width,
+                             :photo_height,
+                             :need_name,
+                             :need_phone_number,
+                             :need_email,
+                             :need_shipping_address,
+                             :send_phone_number_to_provider,
+                             :send_email_to_provider,
+                             :is_flexible,
+                             :disable_notification,
+                             :reply_to_message_id,
+                             :reply_markup], params)
+
+    request("sendInvoice", json_body)
+  end
+
+  @doc """
+  Same as `send_invoice/8` but will raise `Telebrew.Error` on failure
+  """
+  @spec send_invoice(integer, binary, binary, binary, binary, binary, binary, list(labeled_price), keyword) :: result(message)
+  def send_invoice!(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params \\ []) do
+    send_invoice(chat_id, title, description, payload, provider_token, start_parameter, currency, prices, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to reply to shipping queries
+
+  ## Optional Parameters ##
+  - `shipping_options`: (List of maps) A JSON-serialized array of available shipping options
+  - `error_message`: (String) Required if ok is false. Human readable form that explaines why the order failed
+  """
+  @spec answer_shipping_query(binary, boolean, keyword) :: result(:true)
+  def answer_shipping_query(shipping_query_id, ok, params \\ []) do
+    json_body =
+      %{
+        shipping_query_id: shipping_query_id,
+        ok: ok
+      }
+      |> add_optional_params([:shipping_options, :error_message], params)
+
+    request("answerShippingQuery", json_body)
+  end
+
+  @doc """
+  Same as `answer_shipping_query/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec answer_shipping_query!(binary, boolean, keyword) :: :true
+  def answer_shipping_query!(shipping_query_id, ok, params \\ []) do
+    answer_shipping_query(shipping_query_id, ok, params)
+    |> check_error
+  end
+
+  @doc """
+  Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an Update with the field pre_checkout_query.
+  Use this method to respond to such pre-checkout queries.
+
+  Note: The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.
+
+  ## Optional Parameter ##
+  - `error_message`: (String) Required if ok is false. Human readable form that explaines why the order failed
+  """
+  @spec answer_pre_checkout_query(binary, boolean, keyword) :: result(:true)
+  def answer_pre_checkout_query(pre_checkout_query_id, ok, params \\ []) do
+    json_body =
+      %{
+        pre_checkout_query_id: pre_checkout_query_id,
+        ok: ok
+      }
+      |> add_optional_params([:error_message], params)
+
+    request("answerPreCheckoutQuery", json_body)
+  end
+
+  @doc """
+  Same as `answer_pre_checkout_query/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec answer_pre_checkout_query!(binary, boolean, keyword) :: :true
+  def answer_pre_checkout_query!(pre_checkout_query_id, ok, params \\ []) do
+    answer_pre_checkout_query(pre_checkout_query_id, ok, params)
     |> check_error
   end
 
