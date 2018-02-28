@@ -394,6 +394,15 @@ defmodule Telebrew.Methods do
     amount: integer
   }
 
+  @typedoc """
+  Represents one row of the high scores table for a game
+  """
+  @type game_high_score :: %{
+    position: integer,
+    user: user,
+    score: integer
+  }
+
   @doc """
   Sends a message to the given chat_id
 
@@ -2042,8 +2051,13 @@ defmodule Telebrew.Methods do
 
   @doc """
   Used to get data for high score tables
+
+  ## Optional Parameters ##
+  - `chat_id`: (Integer or String) Id of the chat the location is in **required if no inline_message_id**
+  - `message_id`: (Integer) Id of the location message to update **required if no inline_message_id**
+  - `inline_message_id`: (String) Id of the inline message **required if no chat_id and message_id**
   """
-  # TODO: Implement spec
+  @spec get_game_high_score(integer, keyword) :: result(list(game_high_score))
   def get_game_high_score(user_id, params \\ []) do
     json_body = %{user_id: user_id}
     |> add_optional_params([:chat_id,
@@ -2053,10 +2067,15 @@ defmodule Telebrew.Methods do
     request("getGameHighScores", json_body)
   end
 
+  @doc """
+  Same as `get_game_high_score/1` bu will raise `Telebrew.Error` on failure
+  """
+  @spec get_game_high_score(integer, keyword) :: list(game_high_score)
   def get_game_high_score(user_id, params \\ []) do
     set_game_high_score(user_id, params)
     |> check_error
   end
+
   # Helper Functions
 
   defp check_error({:ok, resp}), do: resp
