@@ -3,4 +3,7 @@ defmodule Testing do
 
   on "/test", do: respond "System is up"
 
+  on "echo" do
+    respond m.text
+  end
 end

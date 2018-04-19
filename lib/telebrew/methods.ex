@@ -394,6 +394,15 @@ defmodule Telebrew.Methods do
     amount: integer
   }
 
+  @typedoc """
+  Represents one row of the high scores table for a game
+  """
+  @type game_high_score :: %{
+    position: integer,
+    user: user,
+    score: integer
+  }
+
   @doc """
   Sends a message to the given chat_id
 
@@ -1745,7 +1754,7 @@ defmodule Telebrew.Methods do
   - `contains_masks`: (Boolean) Pass true if a set of mask stickers should be created
   - `mask_position`: (mask_position) A JSON-serialized object for where the mask should be placed on the faces
   """
-  @spec create_new_sticker_set(integer, binary, binary, input_file or binary, binary, keyword) :: result(:true)
+  @spec create_new_sticker_set(integer, binary, binary, input_file | binary, binary, keyword) :: result(:true)
   def create_new_sticker_set(user_id, name, title, png_sticker, emojis, params \\ []) do
     json_body =
       %{
@@ -1763,7 +1772,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `create_new_sticker_set/5 but will raise `Telebrew.Error` on failure
   """
-  @spec create_new_sticker_set(integer, binary, binary, input_file || binary, binary, keyword) :: :true
+  @spec create_new_sticker_set(integer, binary, binary, input_file | binary, binary, keyword) :: :true
   def create_new_sticker_set!(user_id, name, title, png_sticker, emojis, params \\ []) do
     create_new_sticker_set(user_id, name, title, png_sticker, emojis, params)
     |> check_error
@@ -1775,7 +1784,7 @@ defmodule Telebrew.Methods do
   ## Optional Parameter ##
   - `mask_position`: (mask_position) A JSON-serialized object for where the mask should be placed on the faces
   """
-  @spec add_sticker_to_set(integer, binary, input_file or binary, binary, keyword) :: result(:true)
+  @spec add_sticker_to_set(integer, binary, input_file | binary, binary, keyword) :: result(:true)
   def add_sticker_to_set(user_id, name, png_sticker, emojis, params \\ []) do
     json_body =
       %{
@@ -1785,12 +1794,14 @@ defmodule Telebrew.Methods do
         emojis: emojis
       }
       |> add_optional_params([:mask_position], params)
+
+    request("addStickerToSet", json_body)
   end
 
   @doc """
   Same as `add_sticker_to_set/4` but will raise `Telebrew.Error` on failure
   """
-  @spec add_sticker_to_set(integer, binary, input_file or binary, binary, keyword) :: :true
+  @spec add_sticker_to_set(integer, binary, input_file | binary, binary, keyword) :: :true
   def add_sticker_to_set!(user_id, name, png_sticker, emojis, params \\ []) do
     add_sticker_to_set(user_id, name, png_sticker, emojis, params)
     |> check_error
@@ -1967,6 +1978,101 @@ defmodule Telebrew.Methods do
   @spec answer_pre_checkout_query!(binary, boolean, keyword) :: :true
   def answer_pre_checkout_query!(pre_checkout_query_id, ok, params \\ []) do
     answer_pre_checkout_query(pre_checkout_query_id, ok, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to send a game
+
+  ## Optional Parameters ##
+  - `disable_notification`: (Boolean) Disables sound or vibration of the message
+  - `reply_to_message_id`: (Integer) If the message is a reply, ID of the original message
+  - `reply_markup`: (Map) Additional interface options, go [here](#{@docs_address}#sendgame) for more information about this option
+  """
+  @spec send_game(integer, binary, keyword) :: result(message)
+  def send_game(chat_id, game_short_name, params \\ []) do
+    json_body =
+      %{
+        chat_id: chat_id,
+        game_short_name: game_short_name
+      }
+      |> add_optional_params([:disable_notification,
+                             :reply_to_message_id,
+                             :reply_markup], params)
+
+    request("sendGame", json_body)
+  end
+
+  @doc """
+  Same as `send_game/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec send_game(integer, binary, keyword) :: message
+  def send_game!(chat_id, game_short_name, params \\ []) do
+    send_game(chat_id, game_short_name, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to set the score of a user in a game
+
+  Fails if the score is not greater than the current score and force is false
+
+  ## Optional Parameters ##
+  - `force`: (Boolean) Pass true to decrease the score
+  - `disable_edit_message`: (Boolean) Pass true if the game message shouldn't be included in the scoreboard
+  - `chat_id`: (Integer) Required if inline_message_id is not specified
+  - `message_id`: (Integer) Required if inline_message_id is not specified
+  - `inline_message_id`: (String) Required if chat_id and message_id are not specified
+  """
+  @spec set_game_score(integer, integer, keyword) :: result(:true)
+  def set_game_score(user_id, score, params \\ []) do
+    json_body =
+      %{
+        user_id: user_id,
+        score: score
+      }
+      |> add_optional_params([:force,
+                             :disable_edit_message,
+                             :chat_id,
+                             :message_id,
+                             :inline_message_id], params)
+
+    request("setGameScore", json_body)
+  end
+
+  @doc """
+  Same as `set_game_score/2` but will raise `Telebrew.Error` on failure
+  """
+  @spec set_game_score(integer, integer, keyword) :: :true
+  def set_game_score(user_id, score, params \\ []) do
+    set_game_score(user_id, score, params)
+    |> check_error
+  end
+
+  @doc """
+  Used to get data for high score tables
+
+  ## Optional Parameters ##
+  - `chat_id`: (Integer or String) Id of the chat the location is in **required if no inline_message_id**
+  - `message_id`: (Integer) Id of the location message to update **required if no inline_message_id**
+  - `inline_message_id`: (String) Id of the inline message **required if no chat_id and message_id**
+  """
+  @spec get_game_high_score(integer, keyword) :: result(list(game_high_score))
+  def get_game_high_score(user_id, params \\ []) do
+    json_body = %{user_id: user_id}
+    |> add_optional_params([:chat_id,
+                           :message_id,
+                           :inline_message_id], params)
+
+    request("getGameHighScores", json_body)
+  end
+
+  @doc """
+  Same as `get_game_high_score/1` bu will raise `Telebrew.Error` on failure
+  """
+  @spec get_game_high_score(integer, keyword) :: list(game_high_score)
+  def get_game_high_score(user_id, params \\ []) do
+    set_game_high_score(user_id, params)
     |> check_error
   end
 

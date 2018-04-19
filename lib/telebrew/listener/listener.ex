@@ -60,7 +60,7 @@ defmodule Telebrew.Listener do
     cond do
       matched ->
         call_listener(matched, message_without_command, listener_data)
-        
+
       has_default_function?(listener_data.module) ->
         call_listener(:default, message_without_command, listener_data)
 
@@ -82,7 +82,7 @@ defmodule Telebrew.Listener do
   def call_listener(listener, message, listener_data) do
     current_chat_state = get_chat_state(message, listener_data)
     updated_state = apply(listener_data.module, listener, [message, current_chat_state])
-    
+
     Data.update_current_chat_state(listener_data, message.chat.id, updated_state)
   end
 
@@ -94,7 +94,7 @@ defmodule Telebrew.Listener do
         if has_default_function?(listener_data.module) do
           call_listener(:default, message, listener_data)
         else
-          listener_data          
+          listener_data
         end
     end
   end
@@ -120,7 +120,7 @@ defmodule Telebrew.Listener do
   defp get_chat_state(message, listener_data) do
     all_chat_states = listener_data.state.all_chats
     default_state = listener_data.state.initial
-    
+
     Map.get(all_chat_states, message.chat.id, default_state)
   end
 
