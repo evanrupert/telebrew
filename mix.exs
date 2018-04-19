@@ -36,7 +36,8 @@ defmodule Telebrew.Mixfile do
       {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.18.1", only: :dev},
       {:earmark, "~> 1.2", only: :dev},
-      {:excoveralls, "~> 0.8.0", only: :test}
+      {:excoveralls, "~> 0.8.0", only: :test},
+      {:credo, "~> 0.9.1", only: :dev, runtime: false}
     ]
   end
 

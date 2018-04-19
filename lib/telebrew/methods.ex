@@ -1763,7 +1763,7 @@ defmodule Telebrew.Methods do
   @doc """
   Same as `create_new_sticker_set/5 but will raise `Telebrew.Error` on failure
   """
-  @spec create_new_sticker_set(integer, binary, binary, input_file or binary, binary, keyword) :: :true
+  @spec create_new_sticker_set(integer, binary, binary, input_file || binary, binary, keyword) :: :true
   def create_new_sticker_set!(user_id, name, title, png_sticker, emojis, params \\ []) do
     create_new_sticker_set(user_id, name, title, png_sticker, emojis, params)
     |> check_error
