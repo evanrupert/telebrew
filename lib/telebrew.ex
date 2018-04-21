@@ -8,7 +8,7 @@ defmodule Telebrew do
   defmacro __using__(_opts) do
     quote do
       import unquote(__MODULE__)
-      import Telebrew.Methods
+      import Nadia
 
       # make events attribute to capture all of the listener functions
       Module.register_attribute(__MODULE__, :events, accumulate: true)

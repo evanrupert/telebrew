@@ -88,7 +88,7 @@ defmodule Telebrew.ListenerTest do
 
     TestListener.start()
 
-    # test command 
+    # test command
     send_test_message(text: "/test")
     assert_receive :text, 10_000
 

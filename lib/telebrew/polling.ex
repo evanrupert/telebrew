@@ -57,7 +57,8 @@ defmodule Telebrew.Polling do
   end
 
   defp get_last_update(previous_update_id) do
-    updates = Telebrew.HTTP.request!("getUpdates", %{offset: previous_update_id, timeout: @long_polling_timeout})
+    # updates = Telebrew.HTTP.request!("getUpdates", %{offset: previous_update_id, timeout: @long_polling_timeout})
+    {:ok, updates} = Nadia.get_updates(offset: previous_update_id, timeout: @long_polling_timeout)
 
     List.last(updates)
   end
