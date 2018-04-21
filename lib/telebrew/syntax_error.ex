@@ -1,6 +1,6 @@
 defmodule Telebrew.SyntaxError do
   @moduledoc """
-  Module that contains the main error for all event listener syntex errors
+ Contains the main error for all event listener syntax errors
   """
 
   @doc """

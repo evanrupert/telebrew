@@ -1,4 +1,8 @@
 defmodule Telebrew.Listener.State do
+  @moduledoc """
+  Defines the struct used for storing the state of the chats
+  """
+
   defstruct initial: nil, all_chats: %{}, current_chat: nil
 
   def update_current_chat_state(state_struct, chat_id, new_state) do

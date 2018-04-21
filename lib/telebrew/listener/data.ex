@@ -1,4 +1,7 @@
 defmodule Telebrew.Listener.Data do
+  @moduledoc """
+  Provides the struct representation of all the data that the listener needs to keep track of
+  """
   alias Telebrew.Listener.State
   defstruct module: nil, listeners: [], state: %State{}
 

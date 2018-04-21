@@ -1,7 +1,11 @@
 defmodule Telebrew.Stash do
+  @moduledoc """
+  Is used for storing the state of the bots in case
+  the listener process crashes for whatever reason
+  """
   use GenServer
 
-  # Client 
+  # Client
 
   def start_link(state) do
     GenServer.start_link(__MODULE__, state, name: __MODULE__)

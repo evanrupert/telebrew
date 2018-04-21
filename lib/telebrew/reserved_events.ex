@@ -1,5 +1,8 @@
 defmodule Telebrew.ReservedEvents do
-  
+  @moduledoc """
+  Is used to store the reserved events list
+  """
+
   @reserved_events [
     :text,
     :photo,

@@ -128,7 +128,7 @@ defmodule Telebrew do
         send_message(m.chat.id, t)
       rescue
         ArgumentError ->
-          raise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
+          reraise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
       end
     end
   end
@@ -146,7 +146,7 @@ defmodule Telebrew do
         send_message!(m.chat.id, t)
       rescue
         ArgumentError ->
-          raise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
+          reraise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
       end
     end
   end

@@ -1,5 +1,16 @@
 defmodule Telebrew.Listener do
+  @moduledoc """
+  Listens for updates from the polling module and executes the
+  proper function for the update
+  """
   use GenServer, restart: :transient
+
+  @message_file_types [:sticker,
+                       :audio,
+                       :voice,
+                       :document,
+                       :video,
+                       :video_note]
 
   require Logger
 
@@ -49,7 +60,7 @@ defmodule Telebrew.Listener do
   end
 
   defp is_command?(message) do
-    Map.has_key?(message, :text) and String.starts_with?(message.text, "/")
+    message.text != nil and String.starts_with?(message.text, "/")
   end
 
   defp handle_command(message, listener_data) do
@@ -132,49 +143,28 @@ defmodule Telebrew.Listener do
     # Find the type of message then display a special log message based on the type
     log_message =
       cond do
-        Map.has_key?(message, :text) ->
-          message.text
+        is_file_message?(message) ->
+          get_file_message_log_string(message)
 
-        Map.has_key?(message, :photo) ->
-          file_id = List.first(message.photo).file_id
-          "Photo(#{file_id})"
-
-        Map.has_key?(message, :sticker) ->
-          file_id = message.sticker.file_id
-          "Sticker(file_id)"
-
-        Map.has_key?(message, :audio) ->
-          file_id = message.audio.file_id
-          "Audio(#{file_id})"
-
-        Map.has_key?(message, :voice) ->
-          file_id = message.voice.file_id
-          "Voice(#{file_id})"
-
-        Map.has_key?(message, :document) ->
-          file_id = message.document.file_id
-          "Document(#{file_id})"
-
-        Map.has_key?(message, :video) ->
-          file_id = message.video.file_id
-          "Video(#{file_id})"
-
-        Map.has_key?(message, :video_note) ->
-          file_id = message.video_note.file_id
-          "Video Note(#{file_id})"
-
-        Map.has_key?(message, :venue) ->
+        message.venue != nil ->
           title = message.venue.title
           "Venue(#{title})"
 
-        Map.has_key?(message, :contact) ->
+        message.contact != nil ->
           name = message.contact.first_name
           "Contact(#{name})"
 
-        Map.has_key?(message, :location) ->
+        message.location != nil ->
           lat = message.location.latitude
           lon = message.location.longitude
           "Location(#{lat}, #{lon})"
+
+        not Enum.empty?(message.photo) ->
+          file_id = List.first(message.photo).file_id
+          "Photo(#{file_id})"
+
+        message.text != nil ->
+          message.text
 
         true ->
           # DEBUG
@@ -183,6 +173,20 @@ defmodule Telebrew.Listener do
       end
 
     Logger.info("Received Message: #{log_message}")
+  end
+
+  defp is_file_message?(message) do
+    Enum.any?(@message_file_types, fn(type) -> Map.get(message, type) != nil end)
+  end
+
+  defp get_file_message_log_string(message) do
+    Enum.reduce(@message_file_types, "Unknown file type", fn(type, acc) ->
+      if Map.get(message, type) != nil do
+        "#{String.capitalize(Atom.to_string(type))}(#{Map.get(message, type).file_id})"
+      else
+        acc
+      end
+    end)
   end
 
 end

@@ -1,16 +1,15 @@
 defmodule Telebrew.Polling do
+  @moduledoc """
+  Handles checking telegram for updates by polling their servers with the
+  get_updates function
+  """
   use Task, restart: :transient
 
   require Logger
 
   # The application environment is used to make the timeout intervals optionally configurable by the user
-  @timeout_interval unless Application.get_env(:telebrew, :timeout_interval),
-                      do: 200,
-                      else: Application.get_env(:telebrew, :timeout_interval)
-
-  @long_polling_timeout unless Application.get_env(:telebrew, :long_polling_timeout),
-                          do: 10_000,
-                          else: Application.get_env(:telebrew, :long_polling_timeout)
+  @timeout_interval Application.get_env(:telebrew, :timeout_interval) || 200
+  @long_polling_timeout Application.get_env(:telebrew, :long_polling_timeout) || 10_000
 
   def start_link(_args) do
     Task.start_link(__MODULE__, :run, [])

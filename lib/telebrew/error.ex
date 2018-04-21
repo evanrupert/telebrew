@@ -1,6 +1,6 @@
 defmodule Telebrew.Error do
   @moduledoc """
-  This module stores the default error used by Telebrew
+  Stores the default error used by Telebrew
   """
 
   @doc """
