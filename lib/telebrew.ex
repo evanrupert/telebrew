@@ -125,25 +125,7 @@ defmodule Telebrew do
 
         m = var!(m)
 
-        send_message(m.chat.id, t)
-      rescue
-        ArgumentError ->
-          reraise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"
-      end
-    end
-  end
-
-  @doc """
-  Same as `respond/1` but will raise `Telebrew.Error` on failure
-  """
-  defmacro respond!(text) do
-    quote do
-      try do
-        t = unquote(text) |> to_string
-
-        m = var!(m)
-
-        send_message!(m.chat.id, t)
+        Nadia.send_message(m.chat.id, t)
       rescue
         ArgumentError ->
           reraise Telebrew.SyntaxError, message: "Cannot convert #{inspect unquote(text)} to a string. Respond must be passed an argument that implements the String.Chars protocol"

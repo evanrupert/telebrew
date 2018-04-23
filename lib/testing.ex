@@ -4,8 +4,8 @@ defmodule Testing do
 
   on "/test", do: respond "System is up"
 
-  on "/echo" do
-    send_message m.chat.id, m.text
+  on "/print" do
+    IO.inspect m
   end
 
 end

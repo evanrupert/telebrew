@@ -44,7 +44,8 @@ defmodule Telebrew.Listener do
 
   @impl true
   def handle_cast({:update, message}, listener_data) do
-    log_message(message)
+    # FIXME: Uncomment after testing
+    # log_message(message)
 
     updated_listener_data = call_listener(message, listener_data)
 
@@ -146,19 +147,20 @@ defmodule Telebrew.Listener do
         is_file_message?(message) ->
           get_file_message_log_string(message)
 
-        message.venue != nil ->
+        Map.get(message, :venue) != nil ->
           title = message.venue.title
           "Venue(#{title})"
 
-        message.contact != nil ->
+        Map.get(message, :contact) != nil ->
           name = message.contact.first_name
           "Contact(#{name})"
 
-        message.location != nil ->
+        Map.get(message, :location) != nil ->
           lat = message.location.latitude
           lon = message.location.longitude
           "Location(#{lat}, #{lon})"
 
+        # Check if there are any photos in the message
         not Enum.empty?(message.photo) ->
           file_id = List.first(message.photo).file_id
           "Photo(#{file_id})"
