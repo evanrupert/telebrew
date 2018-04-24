@@ -61,7 +61,7 @@ defmodule Telebrew.Listener do
   end
 
   defp is_command?(message) do
-    message.text != nil and String.starts_with?(message.text, "/")
+    Map.get(message, :text) != nil and String.starts_with?(message.text, "/")
   end
 
   defp handle_command(message, listener_data) do
@@ -126,7 +126,8 @@ defmodule Telebrew.Listener do
   end
 
   defp is_valid_listener_match?(message, event, module) do
-    Map.has_key?(message, event) and Keyword.has_key?(module.__info__(:functions), event)
+    value = Map.get(message, event)
+    value != [] and value != nil and value != "" and Keyword.has_key?(module.__info__(:functions), event)
   end
 
   defp get_chat_state(message, listener_data) do

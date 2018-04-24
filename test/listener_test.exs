@@ -127,7 +127,8 @@ defmodule Telebrew.ListenerTest do
     end)
   end
 
-  setup_all do
+  @tag :listener
+  test "commands and events are properly received" do
     Module.create(TestListener, module_content(self()), Macro.Env.location(__ENV__))
 
     TestListener.start()
@@ -135,93 +136,71 @@ defmodule Telebrew.ListenerTest do
     # Wait for the server to startup
     :timer.sleep(200)
 
-    :ok
-  end
-
-  @tag :listener
-  test "/test command is processed by the listener" do
+    # Command testing
     send_test_message(text: "/test")
     assert_receive :text, 10_000
-  end
 
-  @tag :listener
-  test "photo event is processed by the listener" do
+    # Photo testing
     send_test_message(
       photo: [%{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}]
     )
 
     assert_receive :photo, 10_000
-  end
 
-  @tag :listener
-  test "document event is processed by the listener" do
+    # Document testing
     send_test_message(
       document: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
     assert_receive :default, 10_000
-  end
 
-  @tag :listener
-  test "voice event is processed by the listener" do
+    # voice testing
     send_test_message(
       voice: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
     assert_receive :voice, 10_000
-  end
 
-  @tag :listener
-  test "video_note event is processed by the listener" do
+    # video_note testing
     send_test_message(
       video_note: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
     assert_receive :video_note, 10_000
-  end
 
-  @tag :listener
-  test "audio event is processed by the listener" do
+    # audio testing
     send_test_message(
       audio: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
     assert_receive :audio, 10_000
-  end
 
-  @tag :listener
-  test "sticker event is processed by the listener" do
+    # sticker testing
     send_test_message(
       sticker: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
     assert_receive :sticker, 10_000
-  end
 
-  @tag :listener
-  test "video event is processed by the listener" do
+    # video testing
     send_test_message(
       video: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
     assert_receive :video, 10_000
-  end
 
-  @tag :listener
-  test "venue event is processed by the listener" do
+    # venue testing
     send_test_message(venue: %{title: "Some Title"})
     assert_receive :venue, 10_000
-  end
 
-  @tag :listener
-  test "default is called when given unknown command" do
+    # test default with unknown command
     send_test_message(text: "/random")
     assert_receive :default, 10_000
-  end
 
-  @tag :listener
-  test "default is called against unknown event" do
+    # test default with unknown event
     send_test_message(text: "text_test")
     assert_receive :default, 10_000
+
+    TestListener.stop()
   end
 end
