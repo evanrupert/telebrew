@@ -11,6 +11,8 @@ defmodule Telebrew.Polling do
   @timeout_interval Application.get_env(:telebrew, :timeout_interval) || 200
   @long_polling_timeout Application.get_env(:telebrew, :long_polling_timeout) || 10_000
 
+  @telegram_wrapper Application.get_env(:telebrew, :telegram_wrapper)
+
   def start_link(_args) do
     Task.start_link(__MODULE__, :run, [])
   end
@@ -49,17 +51,20 @@ defmodule Telebrew.Polling do
     try do
       update_listener_if_new_update(previous_update_id)
     rescue
-      e in Telebrew.Error ->
+      e in RuntimeError ->
         log_error(e)
         attempt_function_after_delay(fn -> polling(previous_update_id) end)
     end
   end
 
   defp get_last_update(previous_update_id) do
-    # updates = Telebrew.HTTP.request!("getUpdates", %{offset: previous_update_id, timeout: @long_polling_timeout})
-    {:ok, updates} = Nadia.get_updates(offset: previous_update_id, timeout: @long_polling_timeout)
+    case @telegram_wrapper.get_updates(offset: previous_update_id, timeout: @long_polling_timeout) do
+      {:ok, updates} ->
+        List.last(updates)
 
-    List.last(updates)
+      {:error, error} ->
+        raise error.reason
+    end
   end
 
   defp update_listener_if_new_update(previous_update_id) do

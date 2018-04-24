@@ -1,3 +1,4 @@
-defmodule Telebrew.PollingTest do
+defmodule PollingTest do
   use ExUnit.Case
+
 end

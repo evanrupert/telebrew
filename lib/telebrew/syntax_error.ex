@@ -18,5 +18,5 @@ defmodule Telebrew.SyntaxError do
   """
   defexception message: nil
 
-  def message(%__MODULE__{message: m}), do: inspect(m)
+  def message(%__MODULE__{message: m}), do: m
 end

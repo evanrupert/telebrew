@@ -26,8 +26,4 @@ defmodule Telebrew.ReservedEvents do
     Enum.member?(@reserved_events, event)
   end
 
-  def find(event) do
-    Enum.find(@reserved_events, fn x -> x == event end)
-  end
-
 end

@@ -1,42 +1,21 @@
 defmodule Telebrew.ListenerTest do
   use ExUnit.Case
 
-  # @base_message %{
-  #   chat: %{
-  #     first_name: "Evan",
-  #     id: 139_521_568,
-  #     last_name: "Rupert",
-  #     type: "private",
-  #     username: "Eguy45"
-  #   },
-  #   date: 1_515_815_296,
-  #   entities: [%{length: 5, offset: 0, type: "bot_command"}],
-  #   from: %{
-  #     first_name: "Evan",
-  #     id: 139_521_568,
-  #     is_bot: false,
-  #     language_code: "en-US",
-  #     last_name: "Rupert",
-  #     username: "Eguy45"
-  #   },
-  #   message_id: 1031
-  # }
-
   @base_message %Nadia.Model.Message{
     audio: nil,
     caption: nil,
     channel_chat_created: nil,
     chat: %Nadia.Model.Chat{
-      first_name: "Evan",
-      id: 139_521_568,
-      last_name: "Rupert",
+      first_name: "John",
+      id: 111_111_111,
+      last_name: "Smith",
       photo: nil,
       title: nil,
       type: "private",
-      username: "Eguy45"
+      username: "johnsmith"
     },
     contact: nil,
-    date: 1_524_448_558,
+    date: 1_111_111_111,
     delete_chat_photo: nil,
     document: nil,
     edit_date: nil,
@@ -45,15 +24,15 @@ defmodule Telebrew.ListenerTest do
     forward_from: nil,
     forward_from_chat: nil,
     from: %Nadia.Model.User{
-      first_name: "Evan",
-      id: 139_521_568,
-      last_name: "Rupert",
-      username: "Eguy45"
+      first_name: "John",
+      id: 111_111_111,
+      last_name: "Smith",
+      username: "johnsmith"
     },
     group_chat_created: nil,
     left_chat_member: nil,
     location: nil,
-    message_id: 1494,
+    message_id: 1111,
     migrate_from_chat_id: nil,
     migrate_to_chat_id: nil,
     new_chat_member: nil,

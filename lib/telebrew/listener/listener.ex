@@ -44,8 +44,7 @@ defmodule Telebrew.Listener do
 
   @impl true
   def handle_cast({:update, message}, listener_data) do
-    # FIXME: Uncomment after testing
-    # log_message(message)
+    log_message(message)
 
     updated_listener_data = call_listener(message, listener_data)
 
