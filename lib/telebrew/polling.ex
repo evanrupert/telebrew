@@ -27,11 +27,11 @@ defmodule Telebrew.Polling do
     polling(previous_update_id)
   end
 
-  defp get_last_update_id do
+  def get_last_update_id do
     try do
       request_last_update_with_default()
     rescue
-      e in Telebrew.Error ->
+      e in RuntimeError ->
         log_error(e)
         attempt_function_after_delay(fn -> get_last_update_id() end)
     end
