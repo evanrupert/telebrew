@@ -1,6 +1,8 @@
 defmodule Telebrew.ListenerTest do
   use ExUnit.Case
 
+  alias Telebrew.Listener.{Data, State}
+
   @base_message %Nadia.Model.Message{
     audio: nil,
     caption: nil,
@@ -53,6 +55,8 @@ defmodule Telebrew.ListenerTest do
     quote do
       use Telebrew
 
+      @state 0
+
       on "/test" do
         send(unquote(pid), :text)
       end
@@ -92,6 +96,23 @@ defmodule Telebrew.ListenerTest do
       on "venue" do
         send(unquote(pid), :venue)
       end
+
+      on "/get_message" do
+        send(unquote(pid), {:message, m})
+      end
+
+      on "/get" do
+        send(unquote(pid), {:state, state})
+      end
+
+      on "/increment" do
+        state + 1
+      end
+
+      on "/crash" do
+        Process.exit(self(), :testing)
+      end
+
     end
   end
 
@@ -180,6 +201,43 @@ defmodule Telebrew.ListenerTest do
     send_test_message(text: "text_test")
     assert_receive :default, 10_000
 
+    # send_test_message(text: "/get")
+
+    # assert_receive {:state, 0}, 10_000
+
+    # send_test_message(text: "/increment")
+    # send_test_message(text: "/get")
+
+    # assert_receive {:state, 1}, 10_000
+
+    # send_test_message(text: "/crash")
+    # send_test_message(text: "/get")
+
+    # assert_receive {:state, 1}, 10_000
+
+    send_test_message(text: "/get_message")
+    assert_receive {:message, %Nadia.Model.Message{date: 1_111_111_111}}, 10_000
+
+
     TestListener.stop()
+  end
+
+  test "update_add_chat_states works" do
+    data = %Data{module: nil, listeners: [], state: %State{
+                     initial: 0,
+                     all_chats: %{
+                       1 => 0,
+                       2 => 1
+                     },
+                     current_chat: nil
+                  }}
+    new_state = %{
+      1 => 1,
+      2 => 2
+    }
+
+    updated_data = Data.update_all_chat_states(data, new_state)
+
+    assert updated_data.state.all_chats == new_state
   end
 end

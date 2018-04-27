@@ -2,7 +2,7 @@ defmodule Telebrew.Mixfile do
   use Mix.Project
 
   @description """
-  Simple wrapper for the telegram bot api.
+  Simple framework for the telegram bot api.
   """
 
   def project do

@@ -2,14 +2,22 @@ defmodule Testing do
   @moduledoc false
   use Telebrew
 
-  on "/test", do: respond "System is up"
+  @state 0
 
-  on "/echo", do: respond m.text
+  on "/test" do
+    respond "System is up"
 
-  on "/reverse", do: respond(String.reverse(m.text))
+    state
+  end
 
-  on "/print" do
-    IO.inspect m
+  on "/get" do
+    respond state
+
+    state
+  end
+
+  on "/inc" do
+    state + 1
   end
 
 end
