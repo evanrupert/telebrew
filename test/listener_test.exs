@@ -252,6 +252,24 @@ defmodule Telebrew.ListenerTest do
     cleanup_listener_test()
   end
 
+  # test "message object can be accessed in listener" do
+  #   create_and_start_module(
+  #     quote do
+  #       use Telebrew
+  #       on "/m" do
+  #         date = m.date
+  #         send(unquote(self()), {:date, date})
+  #       end
+  #     end
+  #   )
+
+  #   send_test_message(text: "/m")
+
+  #   assert_receive {:date, 1_111_111_111}, 2_000
+
+  #   cleanup_listener_test()
+  # end
+
   test "update_add_chat_states works" do
     data = %Data{module: nil, listeners: [], state: %State{
                      initial: 0,
