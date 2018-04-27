@@ -51,71 +51,6 @@ defmodule Telebrew.ListenerTest do
     voice: nil
   }
 
-  def module_content(pid) do
-    quote do
-      use Telebrew
-
-      @state 0
-
-      on "/test" do
-        send(unquote(pid), :text)
-      end
-
-      on "photo" do
-        send(unquote(pid), :photo)
-      end
-
-      on "voice" do
-        send(unquote(pid), :voice)
-      end
-
-      on "default" do
-        send(unquote(pid), :default)
-      end
-
-      on "location" do
-        send(unquote(pid), :location)
-      end
-
-      on "video_note" do
-        send(unquote(pid), :video_note)
-      end
-
-      on "sticker" do
-        send(unquote(pid), :sticker)
-      end
-
-      on "audio" do
-        send(unquote(pid), :audio)
-      end
-
-      on "video" do
-        send(unquote(pid), :video)
-      end
-
-      on "venue" do
-        send(unquote(pid), :venue)
-      end
-
-      on "/get_message" do
-        send(unquote(pid), {:message, m})
-      end
-
-      on "/get" do
-        send(unquote(pid), {:state, state})
-      end
-
-      on "/increment" do
-        state + 1
-      end
-
-      on "/crash" do
-        Process.exit(self(), :testing)
-      end
-
-    end
-  end
-
   def send_test_message([{key, value}]) do
     spawn(fn ->
       msg =
@@ -127,99 +62,194 @@ defmodule Telebrew.ListenerTest do
     end)
   end
 
-  @tag :listener
-  test "commands and events are properly received" do
-    Module.create(TestListener, module_content(self()), Macro.Env.location(__ENV__))
+  def create_and_start_module(code) do
+    Module.create(TestListener, code, Macro.Env.location(__ENV__))
 
     TestListener.start()
+  end
 
-    # Wait for the server to startup
-    :timer.sleep(200)
+  def cleanup_listener_test do
+    TestListener.stop()
+  end
 
-    # Command testing
-    send_test_message(text: "/test")
-    assert_receive :text, 10_000
-
-    # Photo testing
-    send_test_message(
-      photo: [%{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}]
+  test "command listening properly executes code" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "/test", do: send(unquote(self()), :text)
+      end
     )
 
-    assert_receive :photo, 10_000
+    send_test_message(text: "/test")
 
-    # Document testing
+    assert_receive :text, 2_000
+
+    cleanup_listener_test()
+  end
+
+  test "photo listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "photo", do: send(unquote(self()), :photo)
+      end
+    )
+    send_test_message(
+      photo: [%{file_id: "agadaqadvkcxgzsuyeafaysechlxzwl6ddaabpfpnmzjdksjmv4aagi"}]
+    )
+
+    assert_receive :photo, 2_000
+
+    cleanup_listener_test()
+  end
+
+  test "document listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "document", do: send(unquote(self()), :document)
+      end
+    )
+
     send_test_message(
       document: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
-    assert_receive :default, 10_000
+    assert_receive :document, 2_000
 
-    # voice testing
+    cleanup_listener_test()
+  end
+
+  test "voice listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "voice", do: send(unquote(self()), :voice)
+      end
+    )
+
     send_test_message(
       voice: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
-    assert_receive :voice, 10_000
+    assert_receive :voice, 2_000
 
-    # video_note testing
+    cleanup_listener_test()
+  end
+
+  test "video_note listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "video_note", do: send(unquote(self()), :video_note)
+      end
+    )
+
     send_test_message(
       video_note: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
-    assert_receive :video_note, 10_000
+    assert_receive :video_note, 2_000
 
-    # audio testing
+    cleanup_listener_test()
+  end
+
+  test "audio listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "audio", do: send(unquote(self()), :audio)
+      end
+    )
+
     send_test_message(
       audio: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
-    assert_receive :audio, 10_000
+    assert_receive :audio, 2_000
 
-    # sticker testing
-    send_test_message(
-      sticker: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
+    cleanup_listener_test()
+  end
+
+  test "video listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "video", do: send(unquote(self()), :video)
+      end
     )
 
-    assert_receive :sticker, 10_000
-
-    # video testing
     send_test_message(
       video: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
     )
 
-    assert_receive :video, 10_000
+    assert_receive :video, 2_000
 
-    # venue testing
+    cleanup_listener_test()
+  end
+
+  test "sticker listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "sticker", do: send(unquote(self()), :sticker)
+      end
+    )
+
+    send_test_message(
+      sticker: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
+    )
+
+    assert_receive :sticker, 2_000
+
+    cleanup_listener_test()
+  end
+
+  test "venue listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "venue", do: send(unquote(self()), :venue)
+      end
+    )
+
     send_test_message(venue: %{title: "Some Title"})
-    assert_receive :venue, 10_000
 
-    # test default with unknown command
-    send_test_message(text: "/random")
-    assert_receive :default, 10_000
+    assert_receive :venue, 2_000
 
-    # test default with unknown event
-    send_test_message(text: "text_test")
-    assert_receive :default, 10_000
+    cleanup_listener_test()
+  end
 
-    # send_test_message(text: "/get")
+  test "default function is called if event listener not defined" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "default", do: send(unquote(self()), :default)
+      end
+    )
 
-    # assert_receive {:state, 0}, 10_000
+    send_test_message(
+      document: %{file_id: "AgADAQADvKcxGzsuyEafayseChLXzWl6DDAABPfPNmzjDkSjmV4AAgI"}
+    )
 
-    # send_test_message(text: "/increment")
-    # send_test_message(text: "/get")
+    assert_receive :default, 2_000
 
-    # assert_receive {:state, 1}, 10_000
+    cleanup_listener_test()
+  end
 
-    # send_test_message(text: "/crash")
-    # send_test_message(text: "/get")
+  test "default function is called if given an unknown command" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "default", do: send(unquote(self()), :default)
+      end
+    )
 
-    # assert_receive {:state, 1}, 10_000
+    send_test_message(text: "/unknown")
 
-    send_test_message(text: "/get_message")
-    assert_receive {:message, %Nadia.Model.Message{date: 1_111_111_111}}, 10_000
+    assert_receive :default, 2_000
 
-
-    TestListener.stop()
+    cleanup_listener_test()
   end
 
   test "update_add_chat_states works" do
