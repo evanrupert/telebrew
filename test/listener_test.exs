@@ -220,6 +220,32 @@ defmodule Telebrew.ListenerTest do
     cleanup_listener_test()
   end
 
+  test "location listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "location", do: send(unquote(self()), :location)
+      end
+    )
+
+    send_test_message(location: %{longitude: 20, latitude: 20})
+
+    assert_receive :location, 2_000
+  end
+
+  test "contact listener works" do
+    create_and_start_module(
+      quote do
+        use Telebrew
+        on "contact", do: send(unquote(self()), :contact)
+      end
+    )
+
+    send_test_message(contact: %{first_name: "Name"})
+
+    assert_receive :contact, 2_000
+  end
+
   test "default function is called if event listener not defined" do
     create_and_start_module(
       quote do
