@@ -12,6 +12,7 @@ defmodule Telebrew.Polling do
   @long_polling_timeout Application.get_env(:telebrew, :long_polling_timeout) || 10_000
 
   @telegram_wrapper Application.get_env(:telebrew, :telegram_wrapper)
+  @quiet Application.get_env(:telebrew, :quiet)
 
   def start_link(_args) do
     Task.start_link(__MODULE__, :run, [])
@@ -20,9 +21,11 @@ defmodule Telebrew.Polling do
   def run do
     previous_update_id = get_last_update_id()
 
-    IO.puts("\n=================")
-    IO.puts("Starting Listener")
-    IO.puts("=================\n")
+    unless @quiet do
+      IO.puts("\n=================")
+      IO.puts("Starting Listener")
+      IO.puts("=================\n")
+    end
 
     polling(previous_update_id)
   end

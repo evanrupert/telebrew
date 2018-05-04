@@ -28,6 +28,7 @@ config :telebrew,
 #### Other optional configuration settings
 - `timeout_interval`: (Integer) Amount of time in milliseconds to wait after network timeout before trying again, defaults to 200
 - `long_polling_timeout`: (Integer) Amount of time to wait for long polling response before resending a request, defaults to 10_000
+- `quiet`: (Boolean) Weather or not to print message logs
 
 ## Usage
 

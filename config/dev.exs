@@ -6,5 +6,8 @@ config :telebrew,
 config :telebrew,
   telegram_wrapper: Nadia
 
+config :telebrew,
+  quiet: false
+
 config :nadia,
   token: System.get_env("TELEGRAM_API_KEY")

@@ -12,6 +12,8 @@ defmodule Telebrew.Listener do
                        :video,
                        :video_note]
 
+  @quiet Application.get_env(:telebrew, :quiet)
+
   require Logger
 
   alias Telebrew.Listener.Data
@@ -44,7 +46,7 @@ defmodule Telebrew.Listener do
 
   @impl true
   def handle_cast({:update, message}, listener_data) do
-    log_message(message)
+    unless @quiet, do: log_message(message)
 
     updated_listener_data = call_listener(message, listener_data)
 
