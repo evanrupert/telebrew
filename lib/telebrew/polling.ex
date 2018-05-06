@@ -23,7 +23,7 @@ defmodule Telebrew.Polling do
 
     unless @quiet do
       IO.puts("\n=================")
-      IO.puts("Starting Listener")
+      IO.puts("Starting Polling")
       IO.puts("=================\n")
     end
 

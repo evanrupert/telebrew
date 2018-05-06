@@ -35,6 +35,7 @@ defmodule Telebrew.Mixfile do
       {:httpoison, "~> 0.13.0"},
       {:poison, "~> 3.1"},
       {:nadia, "~> 0.4.3"},
+      {:cowboy, "~> 1.0.0"},
       {:ex_doc, "~> 0.18.1", only: :dev},
       {:earmark, "~> 1.2", only: :dev},
       {:excoveralls, "~> 0.8.0", only: :test},

@@ -3,6 +3,8 @@ defmodule Telebrew do
   Contains all macros for defining message event listeners
   """
 
+  @url Application.get_env(:telebrew, :websocket_url)
+
   alias Telebrew.ReservedEvents
 
   defmacro __using__(_opts) do
@@ -23,15 +25,16 @@ defmodule Telebrew do
   defmacro __before_compile__(_env) do
     quote do
       def start do
-        # Start Listener to listen for updates from polling
-        # Start Stash to save state in case of Listener failure 
-        # Start Polling to poll the server for updates and send them to the Listener
         {:ok, _pid} =
           Supervisor.start_link(
             [
+              # Start Stash to save state in case of Listener failure
               {Telebrew.Stash, make_initial_listener_data()},
+              # Start Listener to listen for updates from polling
               Telebrew.Listener,
-              Telebrew.Polling
+              # If a websocket url is given then start the webserver else just poll
+              # for updates using Polling
+              (if unquote(@url) do Telebrew.Websocket.Server else Telebrew.Polling end)
             ],
             strategy: :one_for_one,
             name: Telebrew.Supervisor
@@ -56,8 +59,8 @@ defmodule Telebrew do
 
   @doc """
   Main macro used for defining event listeners.
-  The first argument is a string that defines what commmand or event will invoke this macro.  The default message variable is m 
-  meaning that one only needs to use m as the received message.  Commands are 
+  The first argument is a string that defines what commmand or event will invoke this macro.  The default message variable is m
+  meaning that one only needs to use m as the received message.  Commands are
   prefixed by '/'.  Events have no prefix and have to be one of the reserved predefined events.
 
   ## Events ##

@@ -9,5 +9,8 @@ config :telebrew,
 config :telebrew,
   quiet: false
 
+config :telebrew,
+  websocket_url: "TODO"
+
 config :nadia,
   token: System.get_env("TELEGRAM_API_KEY")
