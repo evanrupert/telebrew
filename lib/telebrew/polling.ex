@@ -11,11 +11,11 @@ defmodule Telebrew.Polling do
   @timeout_interval Application.get_env(:telebrew, :timeout_interval) || 200
   @long_polling_timeout Application.get_env(:telebrew, :long_polling_timeout) || 10_000
 
-  @telegram_wrapper if System.get_env("MIX_ENV") == "test" do
+  @telegram_wrapper (if System.get_env("MIX_ENV") == "test" do
     MockWrapper
   else
     Nadia
-  end
+  end)
 
   @quiet Application.get_env(:telebrew, :quiet)
 
