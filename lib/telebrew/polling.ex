@@ -66,7 +66,7 @@ defmodule Telebrew.Polling do
   end
 
   defp get_last_update(previous_update_id) do
-    case @telegram_wrapper.get_updates(offset: previous_update_id, timeout: @long_polling_timeout) do
+    case Nadia.get_updates(offset: previous_update_id, timeout: @long_polling_timeout) do
       {:ok, updates} ->
         List.last(updates)
 
