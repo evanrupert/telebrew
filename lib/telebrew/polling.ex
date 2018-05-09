@@ -11,8 +11,9 @@ defmodule Telebrew.Polling do
   @timeout_interval Application.get_env(:telebrew, :timeout_interval) || 200
   @long_polling_timeout Application.get_env(:telebrew, :long_polling_timeout) || 10_000
 
-  @telegram_wrapper (if System.get_env("MIX_ENV") == "test" do
-    MockWrapper
+  # when testing use the mock wrapper for predictable results
+  @telegram_wrapper (if Mix.env() == :test do
+    Telebrew.Test.MockWrapper
   else
     Nadia
   end)
@@ -66,7 +67,7 @@ defmodule Telebrew.Polling do
   end
 
   defp get_last_update(previous_update_id) do
-    case Nadia.get_updates(offset: previous_update_id, timeout: @long_polling_timeout) do
+    case @telegram_wrapper.get_updates([offset: previous_update_id, timeout: @long_polling_timeout]) do
       {:ok, updates} ->
         List.last(updates)
 
