@@ -3,7 +3,7 @@ defmodule Telebrew do
   Contains all macros for defining message event listeners
   """
 
-  @url Application.get_env(:telebrew, :websocket_url)
+  @url Application.get_env(:telebrew, :webhook_url)
 
   alias Telebrew.ReservedEvents
 
