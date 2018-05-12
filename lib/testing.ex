@@ -10,4 +10,8 @@ defmodule Testing do
     respond "Doing something"
   end
 
+  on "/something_else" do
+    respond "Doing something else"
+  end
+
 end
