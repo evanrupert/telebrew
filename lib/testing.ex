@@ -6,4 +6,8 @@ defmodule Testing do
 
   on "/date", do: respond m.date
 
+  on "/something" do
+    respond "Doing something"
+  end
+
 end
