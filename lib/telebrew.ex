@@ -3,7 +3,7 @@ defmodule Telebrew do
   Contains all macros for defining message event listeners
   """
 
-  @url Application.get_env(:telebrew, :webhook_url)
+  @webhook_url Application.get_env(:telebrew, :webhook_url)
 
   alias Telebrew.ReservedEvents
 
@@ -33,7 +33,12 @@ defmodule Telebrew do
             Telebrew.Listener,
             # If a websocket url is given then start the webserver else just poll
             # for updates using Polling
-            (if unquote(@url) do Telebrew.Websocket.Server else Telebrew.Polling end)
+            (
+              if unquote(@webhook_url) do
+                Telebrew.Websocket.Server
+              else
+                Telebrew.Polling
+              end)
           ],
           strategy: :one_for_one,
           name: Telebrew.Supervisor
