@@ -26,7 +26,6 @@ defmodule Telebrew.Mixfile do
 
   def application do
     [
-      mod: {Telebrew.Application, []},
       extra_applications: [:logger, :httpoison]
     ]
   end
