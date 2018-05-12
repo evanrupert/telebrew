@@ -25,20 +25,19 @@ defmodule Telebrew do
   defmacro __before_compile__(_env) do
     quote do
       def start do
-        {:ok, _pid} =
-          Supervisor.start_link(
-            [
-              # Start Stash to save state in case of Listener failure
-              {Telebrew.Stash, make_initial_listener_data()},
-              # Start Listener to listen for updates from polling
-              Telebrew.Listener,
-              # If a websocket url is given then start the webserver else just poll
-              # for updates using Polling
-              (if unquote(@url) do Telebrew.Websocket.Server else Telebrew.Polling end)
-            ],
-            strategy: :one_for_one,
-            name: Telebrew.Supervisor
-          )
+        Supervisor.start_link(
+          [
+            # Start Stash to save state in case of Listener failure
+            {Telebrew.Stash, make_initial_listener_data()},
+            # Start Listener to listen for updates from polling
+            Telebrew.Listener,
+            # If a websocket url is given then start the webserver else just poll
+            # for updates using Polling
+            (if unquote(@url) do Telebrew.Websocket.Server else Telebrew.Polling end)
+          ],
+          strategy: :one_for_one,
+          name: Telebrew.Supervisor
+        )
       end
 
       defp make_initial_listener_data do

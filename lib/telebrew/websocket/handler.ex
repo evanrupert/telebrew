@@ -5,7 +5,6 @@ defmodule Telebrew.Websocket.Handler do
   @behaviour :cowboy_websocket
 
   @quiet Application.get_env(:telebrew, :quiet)
-  @url Application.get_env(:telebrew, :websocket_url)
 
 
   def init(req, state) do

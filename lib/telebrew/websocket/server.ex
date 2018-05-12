@@ -3,6 +3,8 @@ defmodule Telebrew.Websocket.Server do
   Defines a task for starting a cowboy server
   """
 
+  @url Application.get_env(:telebrew, :webhook_url)
+
   use Task, restart: :transient
 
   require Logger
@@ -12,6 +14,8 @@ defmodule Telebrew.Websocket.Server do
   end
 
   def run do
+    Nadia.set_webhook(url: @url)
+
     dispatch_config = :cowboy_router.compile([
       { :_,
         [
