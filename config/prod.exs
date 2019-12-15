@@ -2,7 +2,7 @@ use Mix.Config
 
 config :telebrew,
   telegram_wrapper: Nadia,
-  quiet: false,
+  quiet: true,
   listener_module: Testing
 
 config :nadia,

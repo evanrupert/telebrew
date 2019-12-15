@@ -33,7 +33,7 @@ defmodule Telebrew.Mixfile do
 
   defp deps do
     [
-      {:httpoison, "~> 0.13.0"},
+      {:httpoison, "~> 1.6", override: true},
       {:poison, "~> 3.1"},
       {:nadia, "~> 0.4.3"},
       {:cowboy, "~> 1.0.0"},

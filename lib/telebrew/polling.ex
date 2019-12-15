@@ -12,8 +12,7 @@ defmodule Telebrew.Polling do
   @long_polling_timeout Application.get_env(:telebrew, :long_polling_timeout) || 10_000
 
   # when testing use the mock wrapper for predictable results
-  # @telegram_wrapper Application.get_env(:telebrew, :telegram_wrapper)
-  @telegram_wrapper Nadia
+  @telegram_wrapper Application.get_env(:telebrew, :telegram_wrapper)
 
   @quiet Application.get_env(:telebrew, :quiet)
 
@@ -69,7 +68,7 @@ defmodule Telebrew.Polling do
         List.last(updates)
 
       {:error, error} ->
-        raise error.reason
+        raise (inspect(error.reason))
     end
   end
 

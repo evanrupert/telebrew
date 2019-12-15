@@ -2,12 +2,13 @@ defmodule Testing do
   @moduledoc false
   use Telebrew
 
-  on "/test", do: respond "System is up"
+  # TODO: Fix tests
+  # TODO: Figure out ElixirLs warning on macros
 
-  on "/date", do: respond m.date
-
-  on "/something" do
-    respond "Something"
+  on "/hello" do
+    respond "World"
   end
+
+  on "/ping", do: respond "Pong"
 
 end
